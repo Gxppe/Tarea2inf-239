@@ -1,0 +1,7 @@
+### GET USER INFORMATION
+GET http://localhost:3000/api/informacion/marco.repetto@usm.cl
+Accept: application/json
+
+### GET USER INFORMATION (NO EXISTE)
+GET http://localhost:3000/api/informacion/noexistooo
+Accept: application/json

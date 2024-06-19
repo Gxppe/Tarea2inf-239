@@ -14,21 +14,29 @@ datasource db {
 }
 
 model Usuario {
-  usuario_id       Int      @id @default(autoincrement())
-  direccion_correo String   @unique
-  descripcion      String
-  fecha_creacion   DateTime @default(now())
-  nombre           String
-  clave            String
-  estado           Int
-  correosEnviados  Correo[] @relation("RemitenteRelation")
-  correosRecibidos Correo[] @relation("DestinatarioRelation")
+  usuario_id            Int                   @id @default(autoincrement())
+  direccion_correo      String                @unique
+  descripcion           String
+  fecha_creacion        DateTime              @default(now())
+  nombre                String
+  clave                 String
+  estado                Int
+  correosEnviados       Correo[]              @relation("RemitenteRelation")
+  correosRecibidos      Correo[]              @relation("DestinatarioRelation")
+  direccionesBloqueadas Direccion_bloqueada[]
+  direccionesFavoritas  Direccion_favorita[]
 }
 
 model Direccion_bloqueada {
-  direccion_bloqueada String   @id
+  direccion_bloqueada String  @id
   usuario_id          Int
-  fecha_bloqueo       DateTime @default(now())
+  usuario             Usuario @relation(fields: [usuario_id], references: [usuario_id])
+}
+
+model Direccion_favorita {
+  direccion_favorita String  @id
+  usuario_id         Int
+  usuario            Usuario @relation(fields: [usuario_id], references: [usuario_id])
 }
 
 model Correo {
