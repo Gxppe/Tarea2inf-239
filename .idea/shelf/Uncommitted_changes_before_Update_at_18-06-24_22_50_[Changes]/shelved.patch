@@ -1,0 +1,78 @@
+Index: prisma/schema.prisma
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = \"prisma-client-js\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\n\nmodel Usuario {\n  usuario_id Int @id @default(autoincrement())\n  direccion_correo String @unique\n  descripcion String\n  fecha_creacion DateTime @default(now())\n  nombre String\n  clave String\n  estado Int\n  correosEnviados    Correo[]    @relation(\"RemitenteRelation\")\n  correosRecibidos   Correo[]    @relation(\"DestinatarioRelation\")\n  direccionesBloqueadas Direccion_bloqueada[]\n  direccionesFavoritas  Direccion_favorita[]\n}\n\nmodel Direccion_bloqueada{\n  direccion_bloqueada String @id\n  usuario_id Int\n  usuario Usuario @relation(fields: [usuario_id], references: [usuario_id])\n}\n\nmodel Direccion_favorita{\n  direccion_favorita String @id\n  usuario_id Int\n  usuario Usuario @relation(fields: [usuario_id], references: [usuario_id])\n\n}\n\nmodel Correo{\n  correo_id String @id @unique\n  remitente Int\n  destinatario Int\n  asunto String\n  Cuerpo String\n  fecha_envio DateTime @default(now())\n  leido Boolean\n  usuarioremitente    Usuario   @relation(\"RemitenteRelation\", fields: [remitente], references: [usuario_id])\n  usuariodestinatario Usuario   @relation(\"DestinatarioRelation\", fields: [destinatario], references: [usuario_id])\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/prisma/schema.prisma b/prisma/schema.prisma
+--- a/prisma/schema.prisma	(revision 927f6c648b4ad801fa4945972e0cf792d5e63809)
++++ b/prisma/schema.prisma	(date 1718765378287)
+@@ -13,42 +13,32 @@
+   url      = env("DATABASE_URL")
+ }
+ 
+-
+ model Usuario {
+-  usuario_id Int @id @default(autoincrement())
+-  direccion_correo String @unique
+-  descripcion String
+-  fecha_creacion DateTime @default(now())
+-  nombre String
+-  clave String
+-  estado Int
+-  correosEnviados    Correo[]    @relation("RemitenteRelation")
+-  correosRecibidos   Correo[]    @relation("DestinatarioRelation")
+-  direccionesBloqueadas Direccion_bloqueada[]
+-  direccionesFavoritas  Direccion_favorita[]
++  usuario_id       Int      @id @default(autoincrement())
++  direccion_correo String   @unique
++  descripcion      String
++  fecha_creacion   DateTime @default(now())
++  nombre           String
++  clave            String
++  estado           Int
++  correosEnviados  Correo[] @relation("RemitenteRelation")
++  correosRecibidos Correo[] @relation("DestinatarioRelation")
+ }
+ 
+-model Direccion_bloqueada{
+-  direccion_bloqueada String @id
+-  usuario_id Int
+-  usuario Usuario @relation(fields: [usuario_id], references: [usuario_id])
+-}
+-
+-model Direccion_favorita{
+-  direccion_favorita String @id
+-  usuario_id Int
+-  usuario Usuario @relation(fields: [usuario_id], references: [usuario_id])
+-
++model Direccion_bloqueada {
++  direccion_bloqueada String   @id
++  usuario_id          Int
++  fecha_bloqueo       DateTime @default(now())
+ }
+ 
+-model Correo{
+-  correo_id String @id @unique
+-  remitente Int
+-  destinatario Int
+-  asunto String
+-  Cuerpo String
+-  fecha_envio DateTime @default(now())
+-  leido Boolean
+-  usuarioremitente    Usuario   @relation("RemitenteRelation", fields: [remitente], references: [usuario_id])
+-  usuariodestinatario Usuario   @relation("DestinatarioRelation", fields: [destinatario], references: [usuario_id])
+-}
+\ No newline at end of file
++model Correo {
++  correo_id           String   @id @unique
++  remitente           Int
++  destinatario        Int
++  asunto              String
++  Cuerpo              String
++  fecha_envio         DateTime @default(now())
++  leido               Boolean
++  usuarioremitente    Usuario  @relation("RemitenteRelation", fields: [remitente], references: [usuario_id])
++  usuariodestinatario Usuario  @relation("DestinatarioRelation", fields: [destinatario], references: [usuario_id])
++}

@@ -1,0 +1,228 @@
+Index: package.json
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>{\n  \"name\": \"Tarea2inf-239\",\n  \"version\": \"1.0.50\",\n  \"scripts\": {\n    \"test\": \"echo \\\"Error: no test specified\\\" && exit 1\",\n    \"dev\": \"bun run --watch src/index.ts\"\n  },\n  \"dependencies\": {\n    \"@prisma/client\": \"^5.15.0\",\n    \"elysia\": \"latest\",\n    \"prisma\": \"^5.15.0\"\n  },\n  \"devDependencies\": {\n    \"bun-types\": \"latest\"\n  },\n  \"module\": \"src/index.js\"\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/package.json b/package.json
+--- a/package.json	(revision 927f6c648b4ad801fa4945972e0cf792d5e63809)
++++ b/package.json	(date 1718761330898)
+@@ -1,17 +1,22 @@
+ {
+-  "name": "Tarea2inf-239",
++  "name": "tarea2inf-239",
+   "version": "1.0.50",
+   "scripts": {
+     "test": "echo \"Error: no test specified\" && exit 1",
+     "dev": "bun run --watch src/index.ts"
+   },
+   "dependencies": {
+-    "@prisma/client": "^5.15.0",
+-    "elysia": "latest",
+-    "prisma": "^5.15.0"
++    "@prisma/client": "^5.15.1",
++    "elysia": "^1.0.24",
++    "prisma": "^5.15.1"
+   },
+   "devDependencies": {
+     "bun-types": "latest"
+   },
+-  "module": "src/index.js"
+-}
+\ No newline at end of file
++  "module": "src/index.js",
++  "description": "## Getting Started To get started with this template, simply paste this command into your terminal: ```bash bun create elysia ./elysia-example ```",
++  "main": "index.js",
++  "keywords": [],
++  "author": "",
++  "license": "ISC"
++}
+Index: prisma/schema.prisma
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = \"prisma-client-js\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\n\nmodel Usuario {\n  usuario_id Int @id @default(autoincrement())\n  direccion_correo String @unique\n  descripcion String\n  fecha_creacion DateTime @default(now())\n  nombre String\n  clave String\n  estado Int\n  correosEnviados    Correo[]    @relation(\"RemitenteRelation\")\n  correosRecibidos   Correo[]    @relation(\"DestinatarioRelation\")\n  direccionesBloqueadas Direccion_bloqueada[]\n  direccionesFavoritas  Direccion_favorita[]\n}\n\nmodel Direccion_bloqueada{\n  direccion_bloqueada String @id\n  usuario_id Int\n  usuario Usuario @relation(fields: [usuario_id], references: [usuario_id])\n}\n\nmodel Direccion_favorita{\n  direccion_favorita String @id\n  usuario_id Int\n  usuario Usuario @relation(fields: [usuario_id], references: [usuario_id])\n\n}\n\nmodel Correo{\n  correo_id String @id @unique\n  remitente Int\n  destinatario Int\n  asunto String\n  Cuerpo String\n  fecha_envio DateTime @default(now())\n  leido Boolean\n  usuarioremitente    Usuario   @relation(\"RemitenteRelation\", fields: [remitente], references: [usuario_id])\n  usuariodestinatario Usuario   @relation(\"DestinatarioRelation\", fields: [destinatario], references: [usuario_id])\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/prisma/schema.prisma b/prisma/schema.prisma
+--- a/prisma/schema.prisma	(revision 927f6c648b4ad801fa4945972e0cf792d5e63809)
++++ b/prisma/schema.prisma	(date 1718765333839)
+@@ -13,42 +13,32 @@
+   url      = env("DATABASE_URL")
+ }
+ 
+-
+ model Usuario {
+-  usuario_id Int @id @default(autoincrement())
+-  direccion_correo String @unique
+-  descripcion String
+-  fecha_creacion DateTime @default(now())
+-  nombre String
+-  clave String
+-  estado Int
+-  correosEnviados    Correo[]    @relation("RemitenteRelation")
+-  correosRecibidos   Correo[]    @relation("DestinatarioRelation")
+-  direccionesBloqueadas Direccion_bloqueada[]
+-  direccionesFavoritas  Direccion_favorita[]
++  usuario_id       Int      @id @default(autoincrement())
++  direccion_correo String   @unique
++  descripcion      String
++  fecha_creacion   DateTime @default(now())
++  nombre           String
++  clave            String
++  estado           Int
++  correosEnviados  Correo[] @relation("RemitenteRelation")
++  correosRecibidos Correo[] @relation("DestinatarioRelation")
+ }
+ 
+-model Direccion_bloqueada{
+-  direccion_bloqueada String @id
+-  usuario_id Int
+-  usuario Usuario @relation(fields: [usuario_id], references: [usuario_id])
+-}
+-
+-model Direccion_favorita{
+-  direccion_favorita String @id
+-  usuario_id Int
+-  usuario Usuario @relation(fields: [usuario_id], references: [usuario_id])
+-
++model Direccion_bloqueada {
++  direccion_bloqueada String   @id
++  usuario_id          Int
++  fecha_bloqueo       DateTime @default(now())
+ }
+ 
+-model Correo{
+-  correo_id String @id @unique
+-  remitente Int
+-  destinatario Int
+-  asunto String
+-  Cuerpo String
+-  fecha_envio DateTime @default(now())
+-  leido Boolean
+-  usuarioremitente    Usuario   @relation("RemitenteRelation", fields: [remitente], references: [usuario_id])
+-  usuariodestinatario Usuario   @relation("DestinatarioRelation", fields: [destinatario], references: [usuario_id])
+-}
+\ No newline at end of file
++model Correo {
++  correo_id           String   @id @unique
++  remitente           Int
++  destinatario        Int
++  asunto              String
++  Cuerpo              String
++  fecha_envio         DateTime @default(now())
++  leido               Boolean
++  usuarioremitente    Usuario  @relation("RemitenteRelation", fields: [remitente], references: [usuario_id])
++  usuariodestinatario Usuario  @relation("DestinatarioRelation", fields: [destinatario], references: [usuario_id])
++}
+Index: .env
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+># Environment variables declared in this file are automatically made available to Prisma.\n# See the documentation for more detail: https://pris.ly/d/prisma-schema#accessing-environment-variables-from-the-schema\n\n# Prisma supports the native connection string format for PostgreSQL, MySQL, SQLite, SQL Server, MongoDB and CockroachDB.\n# See the documentation for all the connection string options: https://pris.ly/d/connection-strings\n\nDATABASE_URL=\"postgresql://postgres:LosTr3s@localhost:5432/postgres?schema=public\"
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.env b/.env
+--- a/.env	(revision 927f6c648b4ad801fa4945972e0cf792d5e63809)
++++ b/.env	(date 1718762093924)
+@@ -4,4 +4,4 @@
+ # Prisma supports the native connection string format for PostgreSQL, MySQL, SQLite, SQL Server, MongoDB and CockroachDB.
+ # See the documentation for all the connection string options: https://pris.ly/d/connection-strings
+ 
+-DATABASE_URL="postgresql://postgres:LosTr3s@localhost:5432/postgres?schema=public"
+\ No newline at end of file
++DATABASE_URL="postgresql://postgres:LosTr3s@localhost:5432/tarea2?schema=public"
+\ No newline at end of file
+Index: .idea/modules.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/modules.xml b/.idea/modules.xml
+new file mode 100644
+--- /dev/null	(date 1718760864510)
++++ b/.idea/modules.xml	(date 1718760864510)
+@@ -0,0 +1,8 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="ProjectModuleManager">
++    <modules>
++      <module fileurl="file://$PROJECT_DIR$/.idea/t2.iml" filepath="$PROJECT_DIR$/.idea/t2.iml" />
++    </modules>
++  </component>
++</project>
+\ No newline at end of file
+Index: .idea/vcs.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/vcs.xml b/.idea/vcs.xml
+new file mode 100644
+--- /dev/null	(date 1718760864517)
++++ b/.idea/vcs.xml	(date 1718760864517)
+@@ -0,0 +1,6 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="VcsDirectoryMappings">
++    <mapping directory="" vcs="Git" />
++  </component>
++</project>
+\ No newline at end of file
+Index: .idea/t2.iml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/t2.iml b/.idea/t2.iml
+new file mode 100644
+--- /dev/null	(date 1718760864500)
++++ b/.idea/t2.iml	(date 1718760864500)
+@@ -0,0 +1,12 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<module type="WEB_MODULE" version="4">
++  <component name="NewModuleRootManager">
++    <content url="file://$MODULE_DIR$">
++      <excludeFolder url="file://$MODULE_DIR$/.tmp" />
++      <excludeFolder url="file://$MODULE_DIR$/temp" />
++      <excludeFolder url="file://$MODULE_DIR$/tmp" />
++    </content>
++    <orderEntry type="inheritedJdk" />
++    <orderEntry type="sourceFolder" forTests="false" />
++  </component>
++</module>
+\ No newline at end of file
+Index: .idea/.gitignore
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/.gitignore b/.idea/.gitignore
+new file mode 100644
+--- /dev/null	(date 1718760864620)
++++ b/.idea/.gitignore	(date 1718760864620)
+@@ -0,0 +1,5 @@
++# Default ignored files
++/shelf/
++/workspace.xml
++# Editor-based HTTP Client requests
++/httpRequests/
+Index: .gitignore
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+># See https://help.github.com/articles/ignoring-files/ for more about ignoring files.\n\n# dependencies\n/node_modules\n/.pnp\n.pnp.js\n\n# testing\n/coverage\n\n# next.js\n/.next/\n/out/\n\n# production\n/build\n\n# misc\n.DS_Store\n*.pem\n\n# debug\nnpm-debug.log*\nyarn-debug.log*\nyarn-error.log*\n\n# local env files\n.env.local\n.env.development.local\n.env.test.local\n.env.production.local\n\n# vercel\n.vercel\n\n**/*.trace\n**/*.zip\n**/*.tar.gz\n**/*.tgz\n**/*.log\npackage-lock.json\n**/*.bun
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.gitignore b/.gitignore
+--- a/.gitignore	(revision 927f6c648b4ad801fa4945972e0cf792d5e63809)
++++ b/.gitignore	(date 1718761897338)
+@@ -29,6 +29,7 @@
+ .env.development.local
+ .env.test.local
+ .env.production.local
++.env
+ 
+ # vercel
+ .vercel
