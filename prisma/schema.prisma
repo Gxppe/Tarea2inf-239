@@ -24,7 +24,7 @@ model Usuario {
   correosEnviados       Correo[]              @relation("RemitenteRelation")
   correosRecibidos      Correo[]              @relation("DestinatarioRelation")
   direccionesBloqueadas Direccion_bloqueada[]
-  direccionesFavoritas  Direccion_favorita[]
+  correosFavoritos      Favorito[]            @relation("FavoritosRelation")
 }
 
 model Direccion_bloqueada {
@@ -33,11 +33,6 @@ model Direccion_bloqueada {
   usuario             Usuario @relation(fields: [usuario_id], references: [usuario_id])
 }
 
-model Direccion_favorita {
-  direccion_favorita String  @id
-  usuario_id         Int
-  usuario            Usuario @relation(fields: [usuario_id], references: [usuario_id])
-}
 
 model Correo {
   correo_id           String   @id @unique
@@ -49,4 +44,14 @@ model Correo {
   leido               Boolean
   usuarioremitente    Usuario  @relation("RemitenteRelation", fields: [remitente], references: [usuario_id])
   usuariodestinatario Usuario  @relation("DestinatarioRelation", fields: [destinatario], references: [usuario_id])
+  favoritos           Favorito[] @relation("FavoritosCorreo")
+}
+
+model Favorito {
+  correo_id  String
+  usuario_id Int
+  esFavorito Boolean @default(true)
+  correo     Correo   @relation("FavoritosCorreo", fields: [correo_id], references: [correo_id])
+  usuario    Usuario  @relation("FavoritosRelation", fields: [usuario_id], references: [usuario_id])
+  @@id([correo_id, usuario_id])
 }
