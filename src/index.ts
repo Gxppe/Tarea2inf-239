@@ -1,7 +1,15 @@
-import { Elysia } from "elysia";
+import { Elysia, Router } from '@elysiajs/core';
+import { BodyParser } from '@elysiajs/body-parser';
+import { registrarUsuario } from './routes/registrar';
 
-const app = new Elysia().get("/", () => "Hello Elysia").listen(3000);
+const api = new Elysia();
+const router = new Router();
 
-console.log(
-  `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
-);
+router.post('/registrar', registrarUsuario);
+
+api.use(BodyParser.json());
+api.use('/api', router);
+
+api.listen(3000, () => {
+  console.log('Servidor corriendo en http://localhost:3000/api');
+});
