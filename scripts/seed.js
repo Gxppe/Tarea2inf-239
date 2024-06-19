@@ -36,6 +36,26 @@ async function main() {
         }
     });
 
+    await prisma.usuario.create({
+        data: {
+            direccion_correo: "sofia.ramirez@usm.cl",
+            descripcion: "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
+            nombre: "Sofia Ramirez",
+            clave: clave,
+            estado: 200
+        }
+    });
+
+    await prisma.usuario.create({
+        data: {
+            direccion_correo: "giuseppe.queirolo@usm.cl",
+            descripcion: "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
+            nombre: "Giuseppe Queirolo",
+            clave: clave,
+            estado: 200
+        }
+    });
+
     // Finish
     console.log("Finished seeding");
 }

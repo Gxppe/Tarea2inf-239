@@ -5,3 +5,24 @@ Accept: application/json
 ### GET USER INFORMATION (NO EXISTE)
 GET http://localhost:3000/api/informacion/noexistooo
 Accept: application/json
+
+### POST MARCAR CORREO FAVORITO
+POST http://localhost:3000/api/marcarcorreo
+Content-Type: application/json
+
+{
+  "correo": "marco.repetto@usm.cl",
+  "clave": "123",
+  "favorito": 1
+}
+
+### POST REGISTRAR USUARIO
+POST http://localhost:3000/api/registrar
+Content-Type: application/json
+
+{
+  "correo": "testeo.hola@usm.cl",
+  "clave": "123",
+  "nombre": "Testeo",
+  "descripcion": "Hola soy un testeo"
+}
