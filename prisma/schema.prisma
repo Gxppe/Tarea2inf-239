@@ -14,45 +14,46 @@ datasource db {
 }
 
 model Usuario {
-  direccion_correo      String                @id
-  descripcion           String
-  fecha_creacion        DateTime              @default(now())
-  nombre                String
-  clave                 String
-  estado                Int
-  correosEnviados       Correo[]              @relation("RemitenteRelation")
-  correosRecibidos      Correo[]              @relation("DestinatarioRelation")
-  usuariosBloqueados    Usuario_bloqueado[]   @relation("Bloqueador")
-  bloqueadoPor          Usuario_bloqueado[]   @relation("Bloqueado")
-  correosFavoritos      Favorito[]            @relation("FavoritosRelation")
+  direccion_correo   String              @id
+  descripcion        String
+  fecha_creacion     DateTime            @default(now())
+  nombre             String
+  clave              String
+  estado             Int
+  correosEnviados    Correo[]            @relation("RemitenteRelation")
+  correosRecibidos   Correo[]            @relation("DestinatarioRelation")
+  usuariosBloqueados Usuario_bloqueado[] @relation("Bloqueador")
+  bloqueadoPor       Usuario_bloqueado[] @relation("Bloqueado")
+  correosFavoritos   Favorito[]          @relation("FavoritosRelation")
 }
 
 model Usuario_bloqueado {
-  bloqueadorCorreo  String
-  bloqueadoCorreo   String
-  bloqueador        Usuario @relation(name: "Bloqueador", fields: [bloqueadorCorreo], references: [direccion_correo])
-  bloqueado         Usuario @relation(name: "Bloqueado", fields: [bloqueadoCorreo], references: [direccion_correo])
+  bloqueadorCorreo String
+  bloqueadoCorreo  String
+  bloqueador       Usuario @relation(name: "Bloqueador", fields: [bloqueadorCorreo], references: [direccion_correo])
+  bloqueado        Usuario @relation(name: "Bloqueado", fields: [bloqueadoCorreo], references: [direccion_correo])
+
   @@id([bloqueadorCorreo, bloqueadoCorreo])
 }
 
-
 model Correo {
-  correo_id           Int   @id @unique
+  correo_id           Int        @id @unique
   remitente           String
   destinatario        String
   asunto              String
   Cuerpo              String
-  fecha_envio         DateTime @default(now())
-  leido               Boolean
-  usuarioremitente    Usuario  @relation("RemitenteRelation", fields: [remitente], references: [direccion_correo])
-  usuariodestinatario Usuario  @relation("DestinatarioRelation", fields: [destinatario], references: [direccion_correo])
+  fecha_envio         DateTime   @default(now())
+  leido               Boolean    @default(false)
+  usuarioremitente    Usuario    @relation("RemitenteRelation", fields: [remitente], references: [direccion_correo])
+  usuariodestinatario Usuario    @relation("DestinatarioRelation", fields: [destinatario], references: [direccion_correo])
   favoritos           Favorito[] @relation("FavoritosCorreo")
 }
 
 model Favorito {
-  correo_id  Int
+  correo_id        Int
   direccion_correo String
-  correo            Correo   @relation("FavoritosCorreo", fields: [correo_id], references: [correo_id])
-  usuario           Usuario  @relation("FavoritosRelation", fields: [direccion_correo], references: [direccion_correo])
+  correo           Correo  @relation("FavoritosCorreo", fields: [correo_id], references: [correo_id])
+  usuario          Usuario @relation("FavoritosRelation", fields: [direccion_correo], references: [direccion_correo])
+
   @@id([correo_id, direccion_correo])
 }

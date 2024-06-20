@@ -21,8 +21,38 @@ POST http://localhost:3000/api/registrar
 Content-Type: application/json
 
 {
-  "correo": "testeo.hola@usm.cl",
+    "nombre": "Testeo",
+    "direccion_correo": "testeo.hola@usm.cl",
+    "clave": "123",
+    "descripcion": "Hola soy un testeo"
+}
+
+### POST MARCAR CORREO FAVORITO (NO EXISTE USUARIO)
+POST http://localhost:3000/api/marcarcorreo
+Content-Type: application/json
+
+{
+  "correo": "noexistooo",
   "clave": "123",
-  "nombre": "Testeo",
-  "descripcion": "Hola soy un testeo"
+  "favorito": 1
+}
+
+### POST MARCAR CORREO FAVORITO (NO EXISTE CORREO)
+POST http://localhost:3000/api/marcarcorreo
+Content-Type: application/json
+
+{
+  "correo": "marco.repetto@usm.cl",
+  "clave": "123",
+  "favorito": 9999
+}
+
+### POST MARCAR CORREO FAVORITO (CORREO NO LE PERTENECE)
+POST http://localhost:3000/api/marcarcorreo
+Content-Type: application/json
+
+{
+  "correo": "marco.repetto@usm.cl",
+  "clave": "123",
+  "favorito": 1
 }

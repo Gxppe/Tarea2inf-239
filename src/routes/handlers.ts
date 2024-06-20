@@ -1,9 +1,19 @@
 import db from '../db';
 
-export async function registrar(options: { nombre: string, correo: string, clave: string, descripcion: string }) {
-    console.log('Proceso de registro');
-    const {nombre, correo, clave, descripcion} = options;
-    const correo_existe = await db.usuario.findUnique({where: {direccion_correo:correo}});
+function esusuario(direccion_correo: string, clave: string){
+    return db.usuario.findUnique({
+        where: {
+            direccion_correo: direccion_correo,
+            clave: clave
+        }
+    });
+}
+
+export async function registrar(body: { nombre: string, direccion_correo: string, clave: string, descripcion: string }) {
+
+    const {nombre, direccion_correo, clave, descripcion} = body;
+
+    const correo_existe = await db.usuario.findUnique({where: {direccion_correo:direccion_correo}});
     if (correo_existe){
         console.log("El correo que estás ingresando ya se encuentra registrado");
         return {
@@ -16,7 +26,7 @@ export async function registrar(options: { nombre: string, correo: string, clave
         return db.usuario.create({
             data: {
                 nombre: nombre,
-                direccion_correo: correo,
+                direccion_correo: direccion_correo,
                 clave: clave,
                 descripcion: descripcion,
                 estado: 200
@@ -28,10 +38,11 @@ export async function registrar(options: { nombre: string, correo: string, clave
                     mensaje: 'Usuario registrado'
                 };
             });
+
     } catch (error) {
         console.error(error);
         return {
-            estado: 400,
+            estado: 500,
             mensaje: 'Error al registrar usuario'
         };
     }
@@ -61,31 +72,25 @@ export async function getInformacion(email: string) {
             });
     } catch (error) {
         console.error(error);
-        return null;
+        return {
+            estado: 500,
+            mensaje: 'Error al obtener información del usuario'
+        };
     }
 }
 
-
-function esusuario(direccion_correo: string, clave: string){
-    return db.usuario.findUnique({
-        where: {
-            direccion_correo: direccion_correo,
-            clave: clave
-        }
-    });
-
-}
-
-export async function marcarcorreo(body: { direccion_correo: string, clave: string, correosFavoritos: number }) {
+export async function marcarcorreo(body: { direccion_correo: string, clave: string, id_correo_fav: number }) {
     console.log('Proceso de marcar correo como favorito');
     try {
-        if (typeof body.correosFavoritos !== 'number') {
+        // Creo que la verificacion de tipo la hace typescript por defecto, no es necesario este if
+        /*if (typeof body.correosFavoritos !== 'number') {
             console.error('Debe registrar un número como favorito');
             return {
                 estado: 400,
                 mensaje: 'Datos de entrada inválidos'
             };
-        }
+        }*/
+
         const verificar = esusuario(body.direccion_correo,body.clave);
         if (!verificar) {
             return {
@@ -93,9 +98,12 @@ export async function marcarcorreo(body: { direccion_correo: string, clave: stri
                 mensaje: 'Usuario no encontrado'
             };
         }
+
+
+
         return db.favorito.create({
             data: {
-                correo_id: body.correosFavoritos,
+                correo_id: body.id_correo_fav,
                 direccion_correo: body.direccion_correo
             }
         })
@@ -114,17 +122,30 @@ export async function marcarcorreo(body: { direccion_correo: string, clave: stri
     }
 }
 
-
 export async function bloquear(body: {direccion_correo: string, clave: string, direccion_bloqueada:string}){
     console.log('Proceso de bloquear direccion de correo');
     try {
-        const verificar = esusuario(body.direccion_correo,body.clave);
-        if (!verificar) {
+        const verificar_usuario = esusuario(body.direccion_correo,body.clave);
+        if (!verificar_usuario) {
             return {
                 estado: 400,
                 mensaje: 'Usuario no encontrado'
             };
         }
+
+        const verificar_bloqueo = await db.usuario.findUnique({
+            where: {
+                direccion_correo: body.direccion_bloqueada
+            }
+        });
+
+        if (!verificar_bloqueo) {
+            return {
+                estado: 400,
+                mensaje: 'Usuario a bloquear no encontrado'
+            };
+        }
+
         return db.usuario_bloqueado.create({
             data: {
                 bloqueadorCorreo: body.direccion_correo,
@@ -134,7 +155,7 @@ export async function bloquear(body: {direccion_correo: string, clave: string, d
             .then(() => {
                 return {
                     estado: 200,
-                    mensaje: 'Direccion bloqueada'
+                    mensaje: 'Direccion bloqueada con éxito'
                 }
             });
     }

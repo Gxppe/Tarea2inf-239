@@ -1,11 +1,34 @@
-import Elysia from "elysia";
+import { Elysia, t } from "elysia";
 import { getInformacion, registrar, marcarcorreo, bloquear} from './handlers';
 
 
 const api = new Elysia()
-    .post('/registrar', ({params: { body }}) => registrar(body))
-    .post('/bloquear', ({params: {body}} ) => bloquear(body))
-    .post('/marcarcorreo', ({params: {fav}} ) => marcarcorreo(fav))
-    .get('/informacion/:correo', ({ params: { correo } }) => getInformacion(correo));
+    .post('/registrar', ({ body }) => registrar(body), {
+        body: t.Object({
+            nombre: t.String(),
+            direccion_correo: t.String(),
+            clave: t.String(),
+            descripcion: t.String()
+        })
+    })
+    .post('/bloquear', ({ body } ) => bloquear(body), {
+        body: t.Object({
+            direccion_correo: t.String(),
+            clave: t.String(),
+            direccion_bloqueada: t.String()
+        })
+    })
+    .post('/marcarcorreo', ({ body } ) => marcarcorreo(body), {
+        body: t.Object({
+            direccion_correo: t.String(),
+            clave: t.String(),
+            id_correo_fav: t.Number()
+        })
+    })
+    .get('/informacion/:correo', ({ params: { correo } }) => getInformacion(correo), {
+        params: t.Object({
+            correo: t.String()
+        })
+    });
 
 export default api;
