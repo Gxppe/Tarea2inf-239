@@ -27,21 +27,12 @@ model Usuario {
   correosFavoritos   Favorito[]          @relation("FavoritosRelation")
 }
 
-model Usuario_bloqueado {
-  bloqueadorCorreo String
-  bloqueadoCorreo  String
-  bloqueador       Usuario @relation(name: "Bloqueador", fields: [bloqueadorCorreo], references: [direccion_correo])
-  bloqueado        Usuario @relation(name: "Bloqueado", fields: [bloqueadoCorreo], references: [direccion_correo])
-
-  @@id([bloqueadorCorreo, bloqueadoCorreo])
-}
-
 model Correo {
-  correo_id           Int        @id @unique
+  correo_id           Int        @id @default(autoincrement())
   remitente           String
   destinatario        String
   asunto              String
-  Cuerpo              String
+  cuerpo              String
   fecha_envio         DateTime   @default(now())
   leido               Boolean    @default(false)
   usuarioremitente    Usuario    @relation("RemitenteRelation", fields: [remitente], references: [direccion_correo])
@@ -56,4 +47,13 @@ model Favorito {
   usuario          Usuario @relation("FavoritosRelation", fields: [direccion_correo], references: [direccion_correo])
 
   @@id([correo_id, direccion_correo])
+}
+
+model Usuario_bloqueado {
+  bloqueadorCorreo String
+  bloqueadoCorreo  String
+  bloqueador       Usuario @relation(name: "Bloqueador", fields: [bloqueadorCorreo], references: [direccion_correo])
+  bloqueado        Usuario @relation(name: "Bloqueado", fields: [bloqueadoCorreo], references: [direccion_correo])
+
+  @@id([bloqueadorCorreo, bloqueadoCorreo])
 }

@@ -1,8 +1,9 @@
 import { Elysia, t } from "elysia";
-import { getInformacion, registrar, marcarcorreo, bloquear} from './handlers';
+import { getInformacion, registrar, marcarcorreo, bloquear, main_test } from './handlers';
 
 
 const api = new Elysia()
+    .get('/', () => main_test())
     .post('/registrar', ({ body }) => registrar(body), {
         body: t.Object({
             nombre: t.String(),

@@ -9,6 +9,10 @@ function esusuario(direccion_correo: string, clave: string){
     });
 }
 
+export async function main_test() {
+    return db.usuario.findMany();
+}
+
 export async function registrar(body: { nombre: string, direccion_correo: string, clave: string, descripcion: string }) {
 
     const {nombre, direccion_correo, clave, descripcion} = body;
@@ -58,7 +62,7 @@ export async function getInformacion(email: string) {
             .then((usuario) => {
                 if (!usuario) {
                     return {
-                        estado: 404,
+                        estado: 400,
                         mensaje: 'Usuario no encontrado'
                     }
                 }
@@ -82,16 +86,7 @@ export async function getInformacion(email: string) {
 export async function marcarcorreo(body: { direccion_correo: string, clave: string, id_correo_fav: number }) {
     console.log('Proceso de marcar correo como favorito');
     try {
-        // Creo que la verificacion de tipo la hace typescript por defecto, no es necesario este if
-        /*if (typeof body.correosFavoritos !== 'number') {
-            console.error('Debe registrar un número como favorito');
-            return {
-                estado: 400,
-                mensaje: 'Datos de entrada inválidos'
-            };
-        }*/
-
-        const verificar = esusuario(body.direccion_correo,body.clave);
+        const verificar = await esusuario(body.direccion_correo,body.clave);
         if (!verificar) {
             return {
                 estado: 400,
@@ -99,25 +94,73 @@ export async function marcarcorreo(body: { direccion_correo: string, clave: stri
             };
         }
 
+        // Verificar si el correo a marcar como favorito existe
+        const verificar_correo = await db.correo.findUnique({
+            where: {
+                correo_id: body.id_correo_fav
+            }
+        });
 
+        if (!verificar_correo) {
+            return {
+                estado: 400,
+                mensaje: 'Correo no encontrado'
+            };
+        }
 
-        return db.favorito.create({
+        // Verificar si el correo ya está marcado como favorito
+        const verificar_favorito = await db.favorito.findUnique({
+            where: {
+                correo_id_direccion_correo: {
+                    correo_id: body.id_correo_fav,
+                    direccion_correo: body.direccion_correo
+                }
+            }
+        });
+
+        if (verificar_favorito) {
+            return {
+                estado: 400,
+                mensaje: 'Correo ya marcado como favorito'
+            };
+        }
+
+        // Verificar pertenencia del correo al usuario
+        const verificar_pertenencia = (await db.correo.findUnique({
+            where: {
+                correo_id: body.id_correo_fav,
+                destinatario: body.direccion_correo
+            }})) || (await db.correo.findUnique({
+                where: {
+                    correo_id: body.id_correo_fav,
+                    remitente: body.direccion_correo
+                }
+            }));
+
+        if (!verificar_pertenencia) {
+            return {
+                estado: 400,
+                mensaje: 'Correo no pertenece al usuario'
+            };
+        }
+
+        await db.favorito.create({
             data: {
                 correo_id: body.id_correo_fav,
                 direccion_correo: body.direccion_correo
             }
-        })
-            .then(() => {
-                return {
-                    estado: 200,
-                    mensaje: 'Correo marcado como favorito'
-                }
-            });
+        });
+
+        return {
+            estado: 200,
+            mensaje: 'Correo marcado como favorito'
+        }
     } catch (error) {
+        console.log(error)
+
         return{
-            estado: 400,
+            estado: 500,
             mensaje: '"Ha existido un error al marcar el correo como favorito'
-        
         }
     }
 }
@@ -161,7 +204,7 @@ export async function bloquear(body: {direccion_correo: string, clave: string, d
     }
     catch (error) {
         return{
-            estado: 400,
+            estado: 500,
             mensaje: '"Ha existido un error al bloquear la direccion de correo'
         
         }
@@ -171,14 +214,6 @@ export async function bloquear(body: {direccion_correo: string, clave: string, d
 export async function desmarcarcorreo(body: { direccion_correo: string, clave: string, correosFavoritos: number }) {
     console.log('Proceso de desmarcar correo como favorito');
     try {
-        if (typeof body.correosFavoritos !== 'number') {
-            console.error('Debe registrar un número como favorito');
-            return {
-                estado: 400,
-                mensaje: 'Datos de entrada inválidos'
-            };
-        }
-
         // Asegurarse de que esusuario sea una función asíncrona si se usa una base de datos
         const verificar = await esusuario(body.direccion_correo, body.clave);
         if (!verificar) {
@@ -188,7 +223,24 @@ export async function desmarcarcorreo(body: { direccion_correo: string, clave: s
             };
         }
 
-        const resultado = await db.favorito.delete({
+        // Verificar si el correo a desmarcar como favorito esta en la lista de favoritos
+        const verificar_correo = await db.favorito.findUnique({
+            where: {
+                correo_id_direccion_correo: {
+                    correo_id: body.correosFavoritos,
+                    direccion_correo: body.direccion_correo
+                }
+            }
+        });
+
+        if (!verificar_correo) {
+            return {
+                estado: 400,
+                mensaje: 'Correo no encontrado en la lista de favoritos'
+            };
+        }
+
+        await db.favorito.delete({
             where: {
                 correo_id_direccion_correo: {
                     correo_id: body.correosFavoritos,

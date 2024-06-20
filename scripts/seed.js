@@ -3,6 +3,9 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 async function main() {
+    // Clear database
+    await prisma.correo.deleteMany();
+    await prisma.usuario.deleteMany();
 
 //region Seed de Usuarios
     // List of possible names
@@ -11,9 +14,19 @@ async function main() {
     const clave = "123";
 
     for (let i = 0; i < 7; i++) {
-        const nombre = nombres[Math.floor(Math.random() * nombres.length)];
-        const apellido = apellidos[Math.floor(Math.random() * apellidos.length)];
-        const direccion_correo = `${nombre.toLowerCase()}.${apellido.toLowerCase()}@usm.cl`;
+        let nombre = nombres[Math.floor(Math.random() * nombres.length)];
+        let apellido = apellidos[Math.floor(Math.random() * apellidos.length)];
+        let direccion_correo = `${nombre.toLowerCase()}.${apellido.toLowerCase()}@usm.cl`;
+
+        while (await prisma.usuario.findUnique({
+            where: {
+                direccion_correo: direccion_correo
+            }
+        }) !== null) {
+            nombre = nombres[Math.floor(Math.random() * nombres.length)];
+            apellido = apellidos[Math.floor(Math.random() * apellidos.length)];
+            direccion_correo = `${nombre.toLowerCase()}.${apellido.toLowerCase()}@usm.cl`;
+        }
 
         await prisma.usuario.create({
             data: {
@@ -30,29 +43,9 @@ async function main() {
 
     await prisma.usuario.create({
         data: {
-            direccion_correo: "marco.repetto@usm.cl",
+            direccion_correo: "alan.turing@usm.cl",
             descripcion: "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-            nombre: "Marco Repetto",
-            clave: clave,
-            estado: 200
-        }
-    });
-
-    await prisma.usuario.create({
-        data: {
-            direccion_correo: "sofia.ramirez@usm.cl",
-            descripcion: "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-            nombre: "Sofia Ramirez",
-            clave: clave,
-            estado: 200
-        }
-    });
-
-    await prisma.usuario.create({
-        data: {
-            direccion_correo: "giuseppe.queirolo@usm.cl",
-            descripcion: "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
-            nombre: "Giuseppe Queirolo",
+            nombre: "Alan Turing",
             clave: clave,
             estado: 200
         }
@@ -85,8 +78,8 @@ async function main() {
                 data: {
                     asunto: asunto,
                     cuerpo: cuerpo,
-                    direccion_correo_destinatario: direccion_correo_destinatario,
-                    direccion_correo_remitente: direccion_correo_remitente,
+                    destinatario: direccion_correo_destinatario,
+                    remitente: direccion_correo_remitente,
                 }
             })
                 .then(() => {

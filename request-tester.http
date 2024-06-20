@@ -1,5 +1,9 @@
+### TEST 0
+GET http://localhost:3000/api/
+Accept: application/json
+
 ### GET USER INFORMATION
-GET http://localhost:3000/api/informacion/marco.repetto@usm.cl
+GET http://localhost:3000/api/informacion/alan.turing@usm.cl
 Accept: application/json
 
 ### GET USER INFORMATION (NO EXISTE)
@@ -11,9 +15,9 @@ POST http://localhost:3000/api/marcarcorreo
 Content-Type: application/json
 
 {
-  "correo": "marco.repetto@usm.cl",
+  "direccion_correo": "alan.turing@usm.cl",
   "clave": "123",
-  "favorito": 1
+  "id_correo_fav": 22
 }
 
 ### POST REGISTRAR USUARIO
@@ -32,9 +36,9 @@ POST http://localhost:3000/api/marcarcorreo
 Content-Type: application/json
 
 {
-  "correo": "noexistooo",
+  "direccion_correo": "noexistooo",
   "clave": "123",
-  "favorito": 1
+  "id_correo_fav": 1
 }
 
 ### POST MARCAR CORREO FAVORITO (NO EXISTE CORREO)
@@ -42,9 +46,9 @@ POST http://localhost:3000/api/marcarcorreo
 Content-Type: application/json
 
 {
-  "correo": "marco.repetto@usm.cl",
+  "direccion_correo": "alan.turing@usm.cl",
   "clave": "123",
-  "favorito": 9999
+  "id_correo_fav": 9999
 }
 
 ### POST MARCAR CORREO FAVORITO (CORREO NO LE PERTENECE)
@@ -52,7 +56,7 @@ POST http://localhost:3000/api/marcarcorreo
 Content-Type: application/json
 
 {
-  "correo": "marco.repetto@usm.cl",
+  "direccion_correo": "alan.turing@usm.cl",
   "clave": "123",
-  "favorito": 1
+  "id_correo_fav": 1
 }
