@@ -67,13 +67,19 @@ export async function getInformacion(email: string) {
 
 export async function marcarcorreo(body: { direccion_correo: string, clave: string, correosFavoritos: number }) {
     try {
+        if (typeof body.correosFavoritos !== 'number') {
+            console.error('Debe registrar un número como favorito');
+            return {
+                estado: 400,
+                mensaje: 'Datos de entrada inválidos'
+            };
+        }
         const usuario = await db.usuario.findUnique({
             where: {
                 direccion_correo: body.direccion_correo,
                 clave: body.clave
             }
         });
-
         if (!usuario) {
             return {
                 estado: 404,

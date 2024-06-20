@@ -35,7 +35,7 @@ model Direccion_bloqueada {
 
 
 model Correo {
-  correo_id           String   @id @unique
+  correo_id           Int   @id @unique
   remitente           Int
   destinatario        Int
   asunto              String
