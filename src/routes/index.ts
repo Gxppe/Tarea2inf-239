@@ -1,10 +1,10 @@
 import Elysia from "elysia";
-import { getInformacion, registrar } from './handlers';
+import { getInformacion, registrar, marcarcorreo} from './handlers';
 
 
 const api = new Elysia()
     .post('/registrar', ({ body }) => registrar(body))
-    //.post('/marcarcorreo', ({ body }) => marcarcorreo(body))
+    .post('/marcarcorreo', ({params: {fav}} ) => marcarcorreo(fav))
     .get('/informacion/:correo', ({ params: { correo } }) => getInformacion(correo));
 
 export default api;

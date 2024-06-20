@@ -65,3 +65,36 @@ export async function getInformacion(email: string) {
     }
 }
 
+export async function marcarcorreo(body: { direccion_correo: string, clave: string, correosFavoritos: number }) {
+    try {
+        const usuario = await db.usuario.findUnique({
+            where: {
+                direccion_correo: body.direccion_correo,
+                clave: body.clave
+            }
+        });
+
+        if (!usuario) {
+            return {
+                estado: 404,
+                mensaje: 'Usuario no encontrado'
+            };
+        }
+        const usuario_id = usuario.usuario_id;
+        return db.favorito.create({
+            data: {
+                correo_id: body.correosFavoritos,
+                usuario_id: usuario_id,
+            }
+        })
+            .then(() => {
+                return {
+                    estado: 200,
+                    mensaje: 'Correo marcado como favorito'
+                }
+            });
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
+}

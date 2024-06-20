@@ -48,9 +48,8 @@ model Correo {
 }
 
 model Favorito {
-  correo_id  String
+  correo_id  Int
   usuario_id Int
-  esFavorito Boolean @default(true)
   correo     Correo   @relation("FavoritosCorreo", fields: [correo_id], references: [correo_id])
   usuario    Usuario  @relation("FavoritosRelation", fields: [usuario_id], references: [usuario_id])
   @@id([correo_id, usuario_id])
