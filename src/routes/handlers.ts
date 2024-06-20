@@ -7,7 +7,7 @@ export async function registrar(options: { nombre: string, correo: string, clave
     if (correo_existe){
         console.log("El correo que estás ingresando ya se encuentra registrado");
         return {
-            "estado":500,
+            "estado":400,
             "mensaje": "El correo que estás ingresando ya se encuentra registrado"
         };
     }
@@ -31,7 +31,7 @@ export async function registrar(options: { nombre: string, correo: string, clave
     } catch (error) {
         console.error(error);
         return {
-            estado: 500,
+            estado: 400,
             mensaje: 'Error al registrar usuario'
         };
     }
@@ -66,7 +66,18 @@ export async function getInformacion(email: string) {
 }
 
 
+function esusuario(direccion_correo: string, clave: string){
+    return db.usuario.findUnique({
+        where: {
+            direccion_correo: direccion_correo,
+            clave: clave
+        }
+    });
+
+}
+
 export async function marcarcorreo(body: { direccion_correo: string, clave: string, correosFavoritos: number }) {
+    console.log('Proceso de marcar correo como favorito');
     try {
         if (typeof body.correosFavoritos !== 'number') {
             console.error('Debe registrar un número como favorito');
@@ -75,15 +86,10 @@ export async function marcarcorreo(body: { direccion_correo: string, clave: stri
                 mensaje: 'Datos de entrada inválidos'
             };
         }
-        const usuario = await db.usuario.findUnique({
-            where: {
-                direccion_correo: body.direccion_correo,
-                clave: body.clave
-            }
-        });
-        if (!usuario) {
+        const verificar = esusuario(body.direccion_correo,body.clave);
+        if (!verificar) {
             return {
-                estado: 404,
+                estado: 400,
                 mensaje: 'Usuario no encontrado'
             };
         }
@@ -100,23 +106,22 @@ export async function marcarcorreo(body: { direccion_correo: string, clave: stri
                 }
             });
     } catch (error) {
-        console.error(error);
-        return null;
+        return{
+            estado: 400,
+            mensaje: '"Ha existido un error al marcar el correo como favorito'
+        
+        }
     }
 }
 
 
 export async function bloquear(body: {direccion_correo: string, clave: string, direccion_bloqueada:string}){
+    console.log('Proceso de bloquear direccion de correo');
     try {
-        const usuario = await db.usuario.findUnique({
-            where: {
-                direccion_correo: body.direccion_correo,
-                clave: body.clave
-            }
-        });
-        if (!usuario) {
+        const verificar = esusuario(body.direccion_correo,body.clave);
+        if (!verificar) {
             return {
-                estado: 404,
+                estado: 400,
                 mensaje: 'Usuario no encontrado'
             };
         }
@@ -133,8 +138,11 @@ export async function bloquear(body: {direccion_correo: string, clave: string, d
                 }
             });
     }
-    catch (error){
-        console.error(error);
-        return null;
+    catch (error) {
+        return{
+            estado: 400,
+            mensaje: '"Ha existido un error al bloquear la direccion de correo'
+        
+        }
     }
 }
