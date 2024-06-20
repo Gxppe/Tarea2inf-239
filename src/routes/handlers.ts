@@ -167,3 +167,46 @@ export async function bloquear(body: {direccion_correo: string, clave: string, d
         }
     }
 }
+
+export async function desmarcarcorreo(body: { direccion_correo: string, clave: string, correosFavoritos: number }) {
+    console.log('Proceso de desmarcar correo como favorito');
+    try {
+        if (typeof body.correosFavoritos !== 'number') {
+            console.error('Debe registrar un número como favorito');
+            return {
+                estado: 400,
+                mensaje: 'Datos de entrada inválidos'
+            };
+        }
+
+        // Asegurarse de que esusuario sea una función asíncrona si se usa una base de datos
+        const verificar = await esusuario(body.direccion_correo, body.clave);
+        if (!verificar) {
+            return {
+                estado: 400,
+                mensaje: 'Usuario no encontrado'
+            };
+        }
+
+        const resultado = await db.favorito.delete({
+            where: {
+                correo_id_direccion_correo: {
+                    correo_id: body.correosFavoritos,
+                    direccion_correo: body.direccion_correo
+                }
+            }
+        });
+
+        return {
+            estado: 200,
+            mensaje: 'Correo desmarcado como favorito'
+        };
+
+    } catch (error) {
+        console.error('Error al desmarcar correo como favorito', error);
+        return {
+            estado: 500,
+            mensaje: 'Ha ocurrido un error al desmarcar el correo como favorito'
+        };
+    }
+}
