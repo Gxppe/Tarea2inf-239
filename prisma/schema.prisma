@@ -14,8 +14,7 @@ datasource db {
 }
 
 model Usuario {
-  usuario_id            Int                   @id @default(autoincrement())
-  direccion_correo      String                @unique
+  direccion_correo      String                @id
   descripcion           String
   fecha_creacion        DateTime              @default(now())
   nombre                String
@@ -23,34 +22,37 @@ model Usuario {
   estado                Int
   correosEnviados       Correo[]              @relation("RemitenteRelation")
   correosRecibidos      Correo[]              @relation("DestinatarioRelation")
-  direccionesBloqueadas Direccion_bloqueada[]
+  usuariosBloqueados    Usuario_bloqueado[]   @relation("Bloqueador")
+  bloqueadoPor          Usuario_bloqueado[]   @relation("Bloqueado")
   correosFavoritos      Favorito[]            @relation("FavoritosRelation")
 }
 
-model Direccion_bloqueada {
-  direccion_bloqueada String  @id
-  usuario_id          Int
-  usuario             Usuario @relation(fields: [usuario_id], references: [usuario_id])
+model Usuario_bloqueado {
+  bloqueadorCorreo  String
+  bloqueadoCorreo   String
+  bloqueador        Usuario @relation(name: "Bloqueador", fields: [bloqueadorCorreo], references: [direccion_correo])
+  bloqueado         Usuario @relation(name: "Bloqueado", fields: [bloqueadoCorreo], references: [direccion_correo])
+  @@id([bloqueadorCorreo, bloqueadoCorreo])
 }
 
 
 model Correo {
   correo_id           Int   @id @unique
-  remitente           Int
-  destinatario        Int
+  remitente           String
+  destinatario        String
   asunto              String
   Cuerpo              String
   fecha_envio         DateTime @default(now())
   leido               Boolean
-  usuarioremitente    Usuario  @relation("RemitenteRelation", fields: [remitente], references: [usuario_id])
-  usuariodestinatario Usuario  @relation("DestinatarioRelation", fields: [destinatario], references: [usuario_id])
+  usuarioremitente    Usuario  @relation("RemitenteRelation", fields: [remitente], references: [direccion_correo])
+  usuariodestinatario Usuario  @relation("DestinatarioRelation", fields: [destinatario], references: [direccion_correo])
   favoritos           Favorito[] @relation("FavoritosCorreo")
 }
 
 model Favorito {
   correo_id  Int
-  usuario_id Int
-  correo     Correo   @relation("FavoritosCorreo", fields: [correo_id], references: [correo_id])
-  usuario    Usuario  @relation("FavoritosRelation", fields: [usuario_id], references: [usuario_id])
-  @@id([correo_id, usuario_id])
+  direccion_correo String
+  correo            Correo   @relation("FavoritosCorreo", fields: [correo_id], references: [correo_id])
+  usuario           Usuario  @relation("FavoritosRelation", fields: [direccion_correo], references: [direccion_correo])
+  @@id([correo_id, direccion_correo])
 }

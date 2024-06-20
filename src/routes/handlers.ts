@@ -65,6 +65,7 @@ export async function getInformacion(email: string) {
     }
 }
 
+
 export async function marcarcorreo(body: { direccion_correo: string, clave: string, correosFavoritos: number }) {
     try {
         if (typeof body.correosFavoritos !== 'number') {
@@ -86,11 +87,10 @@ export async function marcarcorreo(body: { direccion_correo: string, clave: stri
                 mensaje: 'Usuario no encontrado'
             };
         }
-        const usuario_id = usuario.usuario_id;
         return db.favorito.create({
             data: {
                 correo_id: body.correosFavoritos,
-                usuario_id: usuario_id,
+                direccion_correo: body.direccion_correo
             }
         })
             .then(() => {
@@ -100,6 +100,40 @@ export async function marcarcorreo(body: { direccion_correo: string, clave: stri
                 }
             });
     } catch (error) {
+        console.error(error);
+        return null;
+    }
+}
+
+
+export async function bloquear(body: {direccion_correo: string, clave: string, direccion_bloqueada:string}){
+    try {
+        const usuario = await db.usuario.findUnique({
+            where: {
+                direccion_correo: body.direccion_correo,
+                clave: body.clave
+            }
+        });
+        if (!usuario) {
+            return {
+                estado: 404,
+                mensaje: 'Usuario no encontrado'
+            };
+        }
+        return db.usuario_bloqueado.create({
+            data: {
+                bloqueadorCorreo: body.direccion_correo,
+                bloqueadoCorreo: body.direccion_bloqueada
+            }
+        })
+            .then(() => {
+                return {
+                    estado: 200,
+                    mensaje: 'Direccion bloqueada'
+                }
+            });
+    }
+    catch (error){
         console.error(error);
         return null;
     }
