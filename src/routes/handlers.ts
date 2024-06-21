@@ -262,3 +262,32 @@ export async function desmarcarcorreo(body: { direccion_correo: string, clave: s
         };
     }
 }
+
+
+export async function iniciarsesion(email: string) {
+    try {
+        return db.usuario.findUnique({
+            where: {
+                direccion_correo: email
+            }
+        })
+            .then((usuario) => {
+                if (!usuario) {
+                    return {
+                        estado: 400,
+                        mensaje: 'Usuario no encontrado'
+                    }
+                }
+                return {
+                    correo: usuario.direccion_correo,
+                    clave: usuario.clave,
+                };
+            });
+    } catch (error) {
+        console.error(error);
+        return {
+            estado: 500,
+            mensaje: 'Error al obtener información del usuario'
+        };
+    }
+}

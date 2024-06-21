@@ -1,4 +1,7 @@
 import requests
+import json
+import time
+import os
 global correo_ingresado, clave_ingresada
 
 #####################################################################################################################
@@ -67,8 +70,33 @@ def registro():
 def iniciar_sesion():
     correo_ingresado = input("Ingrese su correo electronico: ")
     clave_ingresada = input("Ingrese su clave: ")
-    # Check if the user exists in the database, there is not an url
-    return
+    try:
+        url='http://localhost:3000/api/iniciarsesion/{}'.format(correo_ingresado)
+        response = requests.get(url)    
+        datos = response.json()
+        if datos['clave'] == clave_ingresada:
+            os.system('clear')
+            print("Inicio de sesión exitoso")
+            time.sleep(1)
+
+            return
+        else:
+            os.system('clear')
+            print("Inicio de sesión fallido.")
+            time.sleep(1)
+            if input("¿Desea intentar de nuevo? (s/n): ") == 's':
+                os.system('clear')  
+                return iniciar_sesion()
+            else:
+                os.system('clear')
+                return main()
+
+    except:
+        os.system('clear')
+        print("Correo no encontrado.")
+        time.sleep(1)
+        return iniciar_sesion()
+
 
 def ver_informacion():
     correo = input("Ingrese el correo electronico que desea buscar: ")
@@ -86,8 +114,8 @@ def marcar():
     id_correo = int(input("Ingrese el id del correo que desea marcar como favorito: "))
     url = 'http://localhost:3000/api/marcarcorreo'
     data = {
-        'correo': correo_ingresado
-        'clave': clave_ingresada
+        'correo': correo_ingresado,
+        'clave': clave_ingresada,
         'id_correo': id_correo
     }
     response = requests.post(url, params=data)
@@ -97,8 +125,8 @@ def bloquear():
     correo_bloqueado = input("Ingrese el correo que desea bloquear: ")
     url = 'http://localhost:3000/api/bloquear'
     data = {
-        'correo': correo_ingresado
-        'clave': clave_ingresada
+        'correo': correo_ingresado,
+        'clave': clave_ingresada,
         'correo_bloqueado': correo_bloqueado
     }
     response = requests.post(url, params=data)
@@ -156,3 +184,4 @@ def main():
 
 response = requests.get('https://api.github.com')
 print(response.status_code)
+

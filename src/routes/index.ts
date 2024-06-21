@@ -1,5 +1,5 @@
 import { Elysia, t } from "elysia";
-import { getInformacion, registrar, marcarcorreo, bloquear, main_test } from './handlers';
+import { getInformacion, registrar, marcarcorreo, bloquear, main_test, iniciarsesion } from './handlers';
 
 
 const api = new Elysia()
@@ -30,6 +30,14 @@ const api = new Elysia()
         params: t.Object({
             correo: t.String()
         })
-    });
+    })
+    .get('/iniciarsesion/:correo', ({ params: { correo } }) => iniciarsesion(correo), {
+        params: t.Object({
+            correo: t.String()
+        })
+    })
+    ;
+
+
 
 export default api;
