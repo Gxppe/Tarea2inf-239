@@ -76,6 +76,7 @@ def iniciar_sesion():
         datos = response.json()
         if datos['clave'] == clave_ingresada:
             os.system('clear')
+
             print("Inicio de sesión exitoso")
             time.sleep(1)
 
@@ -149,11 +150,6 @@ def main():
                 opcioni = 3
         if opcioni == 2:
             iniciar_sesion()
-            if response.status_code == 200:
-                print("Inicio de sesión exitoso")
-            else:
-                print("Inicio de sesión fallido.")
-                opcioni = 3
         if opcioni == 3:
             print(menu_salida)
             return
@@ -184,4 +180,4 @@ def main():
 
 response = requests.get('https://api.github.com')
 print(response.status_code)
-
+main()
