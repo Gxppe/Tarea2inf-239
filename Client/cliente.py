@@ -54,17 +54,21 @@ def registro():
     correo_ingresado = input("*Ingrese su correo electronico: ")
     clave_ingresada = input("*Ingrese su clave: ")
     descripcion = input("Ingrese una descripción: ")
-    if not nombre or not correo_ingresado or not clave_ingresada:
+    
+    if not nombre_usuario or not correo_ingresado or not clave_ingresada:
         print("Por favor, llene los campos obligatorios")
         registro()
+        return
+    
     url = 'http://localhost:3000/api/registrar'
     data = {
-        'nombre_usuario': nombre_usuario,
-        'correo': correo_ingresado,
-        'clave': clave_ingresada,
-        'descripcion': descripcion
+        "nombre": nombre_usuario,
+        "direccion_correo": correo_ingresado,
+        "clave": clave_ingresada,
+        "descripcion": descripcion
     }
-    response = requests.post(url, params=data)
+    
+    response = requests.post(url, json=data)
     print(response.json())
 
 def iniciar_sesion():
@@ -152,11 +156,6 @@ def main():
     if opcioni<=3 and opcioni>=1: 
         if opcioni == 1:
             registro()
-            if response.status_code == 200:
-                print("Registro exitoso")
-            else:
-                print("Registro fallido.")
-                opcioni = 3
         if opcioni == 2:
             iniciar_sesion()
         if opcioni == 3:
