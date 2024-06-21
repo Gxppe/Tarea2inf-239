@@ -133,7 +133,16 @@ def bloquear():
     response = requests.post(url, params=data)
     print(response.json())
 
-
+def desmarcar():
+    id_correo = int(input("Ingrese el id del correo que desea desmarcar como favorito: "))
+    url = 'http://localhost:3000/api/desmarcarcorreo'
+    data = {
+        'correo': correo_ingresado,
+        'clave': clave_ingresada,
+        'id_correo': id_correo
+    }
+    response = requests.delete(url, params=data)
+    print(response.json())
 
 
 #####################################################################################################################

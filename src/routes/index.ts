@@ -1,5 +1,5 @@
 import { Elysia, t } from "elysia";
-import { getInformacion, registrar, marcarcorreo, bloquear, main_test, iniciarsesion } from './handlers';
+import { getInformacion, registrar, marcarcorreo, bloquear, main_test, iniciarsesion, desmarcarcorreo } from './handlers';
 
 
 const api = new Elysia()
@@ -34,6 +34,13 @@ const api = new Elysia()
     .get('/iniciarsesion/:correo', ({ params: { correo } }) => iniciarsesion(correo), {
         params: t.Object({
             correo: t.String()
+        })
+    })
+    .delete('/desmarcarcorreo', ({params: {body} } ) => desmarcarcorreo(body), {
+        body: t.Object({
+            direccion_correo: t.String(),
+            clave: t.String(),
+            id_correo_fav: t.Number()
         })
     })
     ;
