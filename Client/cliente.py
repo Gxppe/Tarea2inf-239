@@ -56,10 +56,23 @@ def registro():
     descripcion = input("Ingrese una descripción: ")
     
     if not nombre_usuario or not correo_ingresado or not clave_ingresada:
+        os.system('clear')
         print("Por favor, llene los campos obligatorios")
+        time.sleep(1)
         registro()
         return
     
+#Verifica si el usuario no esta en la base de datos
+    url='http://localhost:3000/api/informacion/{}'.format(correo_ingresado)
+    response = requests.get(url)
+    datos=response.json()
+    if datos['estado'] == 200:
+        os.system('clear')
+        print("Correo ya registrado")
+        time.sleep(1)
+        return registro()
+
+#se registra el usuario
     url = 'http://localhost:3000/api/registrar'
     data = {
         "nombre": nombre_usuario,
@@ -67,9 +80,8 @@ def registro():
         "clave": clave_ingresada,
         "descripcion": descripcion
     }
-    
     response = requests.post(url, json=data)
-    print(response.json())
+    os.system('clear')
 
 def iniciar_sesion():
     correo_ingresado = input("Ingrese su correo electronico: ")
