@@ -19,7 +19,7 @@ Elige una de las siguientes opciones:
 """
 menu_opciones = """
 ------------------------------------------------
-|⋆˚☆˖°¡Hola de nuevo! ¿Qué deseas hacer? °˖☆˚⋆|
+    |⋆˚☆˖°¡Hola! ¿Qué deseas hacer? °˖☆˚⋆|
 ------------------------------------------------
 Elige una de las siguientes opciones:
 1. Ver informacion sobre un correo electronico
@@ -31,14 +31,31 @@ Elige una de las siguientes opciones:
 
 """
 menu_salida = """
----------------------------------------
+--------------------------------------------
 | ๋࣭ ⭑⚝¡Gracias por usar CommuniKen!⚝⭑ ࣭ ๋|
----------------------------------------
+--------------------------------------------
 """
+
+# PRINTS
+def print_error(mensaje, end="\n", press_enter=True):
+    print(f"\033[38;5;1mERROR: {mensaje}\033[0m")
+    if not press_enter:
+        return
+    input("\nPresiona enter para continuar...")
+
+def print_success(mensaje, end="\n"):
+    print(f"\033[38;5;2m{mensaje}\033[0m")
+    time.sleep(2)
+
+def print_warning(mensaje, end="\n"):
+    text = f"\033[38;5;3m{mensaje}\033[0m"
+    print(text)
+
+
 #####################################################################################################################
 # Funciones de opciones
 def opcion_inicial():
-    print(menu_inicial)
+    print(menu_inicial, end="")
     opcion = int(input("Ingrese el número de la opción que desea: "))
     return opcion
 
@@ -49,30 +66,22 @@ def opcion_menu():
 #####################################################################################################################
 # Funciones
 def registro():
-    print("* Obligatorio")
-    nombre_usuario = input("*Ingrese su nombre de usuario: ")
-    correo_ingresado = input("*Ingrese su correo electronico: ")
-    clave_ingresada = input("*Ingrese su clave: ")
+    os.system('clear')
+    print("\nRegistro de usuario\n")
+    print_warning("* Campos obligatorios")
+    nombre_usuario = input("\033[38;5;3m*\033[0m "+"Ingrese su nombre: ")
+    correo_ingresado = input("\033[38;5;3m*\033[0m "+"Ingrese su correo electronico: ")
+    clave_ingresada = input("\033[38;5;3m*\033[0m "+"Ingrese su clave: ")
     descripcion = input("Ingrese una descripción: ")
     
     if not nombre_usuario or not correo_ingresado or not clave_ingresada:
         os.system('clear')
-        print("Por favor, llene los campos obligatorios")
+        print_warning("\nPor favor, llene los campos obligatorios")
         time.sleep(1)
         registro()
         return
-    
-#Verifica si el usuario no esta en la base de datos
-    url='http://localhost:3000/api/informacion/{}'.format(correo_ingresado)
-    response = requests.get(url)
-    datos=response.json()
-    if datos['estado'] == 200:
-        os.system('clear')
-        print("Correo ya registrado")
-        time.sleep(1)
-        return registro()
 
-#se registra el usuario
+    #Se registra el usuario
     url = 'http://localhost:3000/api/registrar'
     data = {
         "nombre": nombre_usuario,
@@ -80,39 +89,66 @@ def registro():
         "clave": clave_ingresada,
         "descripcion": descripcion
     }
-    response = requests.post(url, json=data)
+    response = requests.post(url, json=data).json()
+
+    if response['estado'] == 400:
+        os.system('clear')
+
+        print_error(response['mensaje'])
+        os.system('clear')
+
+        return main()
+    elif response['estado'] == 500:
+        os.system('clear')
+
+        print_error(response['mensaje'])
+        os.system('clear')
+
+        return main()
+
+    os.system('clear')
+    print_success(response['mensaje'])
+
     os.system('clear')
 
 def iniciar_sesion():
+    os.system('clear')
+    print("\nInicio de sesión\n")
     correo_ingresado = input("Ingrese su correo electronico: ")
     clave_ingresada = input("Ingrese su clave: ")
     try:
         url='http://localhost:3000/api/iniciarsesion/{}'.format(correo_ingresado)
-        response = requests.get(url)    
+        response = requests.get(url)
         datos = response.json()
-        if datos['clave'] == clave_ingresada:
-            os.system('clear')
 
-            print("Inicio de sesión exitoso")
-            time.sleep(1)
-
-            return
-        else:
+        if datos['estado'] != 200:
             os.system('clear')
-            print("Inicio de sesión fallido.")
-            time.sleep(1)
-            if input("¿Desea intentar de nuevo? (s/n): ") == 's':
-                os.system('clear')  
+            print_error(f"\n{datos['mensaje']}", press_enter=False)
+            if input("¿Desea intentar de nuevo? (s/n): ").lower() == 's':
+                os.system('clear')
                 return iniciar_sesion()
             else:
                 os.system('clear')
                 return main()
 
+        if datos['clave'] != clave_ingresada:
+            os.system('clear')
+            print_error("\nLas credenciales ingresadas no coinciden.", press_enter=False)
+            if input("¿Desea intentar de nuevo? (s/n): ").lower() == 's':
+                os.system('clear')
+                return iniciar_sesion()
+            else:
+                os.system('clear')
+                return main()
+
+        os.system('clear')
+        print_success(f"\nInicio de sesión exitoso. Bienvenido, {datos['nombre']}.")
     except:
         os.system('clear')
-        print("Correo no encontrado.")
-        time.sleep(1)
-        return iniciar_sesion()
+        print_error("\nHubo un error al intentar iniciar sesión.")
+
+        return main()
+
 
 
 def ver_informacion():
@@ -120,12 +156,25 @@ def ver_informacion():
     if not correo:
         print("No ingresaste nada, intenta de nuevo.")
         ver_informacion()
-    url = 'http://localhost:3000/api/informacion'
-    data = {
-        'correo': correo
-    }
-    response = requests.get(url, params=data)
-    print(response.json())
+    url = 'http://localhost:3000/api/informacion/'+correo
+
+    response = requests.get(url).json()
+
+    if response['estado'] == 400:
+        os.system('clear')
+        print_error(f"\n{response['mensaje']}")
+        return
+    elif response['estado'] == 500:
+        os.system('clear')
+        print_error(f"\n{response['mensaje']}")
+        return
+
+    informacion = f"INFORMACIÓN DE {correo.upper()}\n\nNombre: {response['nombre']}\nDescripción: {response['descripcion']}"
+
+    os.system('clear')
+    print(informacion)
+    input("\nPresiona enter para continuar...")
+
 
 def marcar():
     id_correo = int(input("Ingrese el id del correo que desea marcar como favorito: "))
@@ -164,6 +213,7 @@ def desmarcar():
 #####################################################################################################################
 # Main
 def main():
+    os.system('clear')
     opcioni = opcion_inicial()
     if opcioni<=3 and opcioni>=1: 
         if opcioni == 1:
@@ -171,6 +221,7 @@ def main():
         if opcioni == 2:
             iniciar_sesion()
         if opcioni == 3:
+            os.system('clear')
             print(menu_salida)
             return
     else:
@@ -178,6 +229,7 @@ def main():
         main()
 
     while True:
+        os.system('clear')
         opcion = opcion_menu()
         if opcion == 1:
             ver_informacion()

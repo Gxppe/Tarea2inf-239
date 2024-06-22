@@ -2,25 +2,15 @@
 GET http://localhost:3000/api/
 Accept: application/json
 
-### GET USER INFORMATION
+### USER INFORMATION
 GET http://localhost:3000/api/informacion/alan.turing@usm.cl
 Accept: application/json
 
-### GET USER INFORMATION (NO EXISTE)
+### USER INFORMATION (NO EXISTE)
 GET http://localhost:3000/api/informacion/noexistooo
 Accept: application/json
 
-### POST MARCAR CORREO FAVORITO
-POST http://localhost:3000/api/marcarcorreo
-Content-Type: application/json
-
-{
-  "direccion_correo": "alan.turing@usm.cl",
-  "clave": "123",
-  "id_correo_fav": 22
-}
-
-### POST REGISTRAR USUARIO
+### REGISTRAR USUARIO
 POST http://localhost:3000/api/registrar
 Content-Type: application/json
 
@@ -31,7 +21,7 @@ Content-Type: application/json
     "descripcion": "Hola soy un testeo"
 }
 
-### POST MARCAR CORREO FAVORITO (NO EXISTE USUARIO)
+### MARCAR CORREO FAVORITO (NO EXISTE USUARIO)
 POST http://localhost:3000/api/marcarcorreo
 Content-Type: application/json
 
@@ -41,7 +31,7 @@ Content-Type: application/json
   "id_correo_fav": 1
 }
 
-### POST MARCAR CORREO FAVORITO (NO EXISTE CORREO)
+### MARCAR CORREO FAVORITO (NO EXISTE CORREO)
 POST http://localhost:3000/api/marcarcorreo
 Content-Type: application/json
 
@@ -51,7 +41,7 @@ Content-Type: application/json
   "id_correo_fav": 9999
 }
 
-### POST MARCAR CORREO FAVORITO (CORREO NO LE PERTENECE)
+### MARCAR CORREO FAVORITO (CORREO NO LE PERTENECE)
 POST http://localhost:3000/api/marcarcorreo
 Content-Type: application/json
 
@@ -60,3 +50,45 @@ Content-Type: application/json
   "clave": "123",
   "id_correo_fav": 1
 }
+
+### MARCAR CORREO FAVORITO
+POST http://localhost:3000/api/marcarcorreo
+Content-Type: application/json
+
+{
+  "direccion_correo": "alan.turing@usm.cl",
+  "clave": "123",
+  "id_correo_fav": 22
+}
+
+### DESMARCAR CORREO FAVORITO (NO EXISTE USUARIO)
+DELETE http://localhost:3000/api/desmarcarcorreo
+Content-Type: application/json
+
+{
+  "direccion_correo": "noexistooo",
+  "clave": "123",
+  "id_correo": 1
+}
+
+### DESMARCAR CORREO FAVORITO (NO EXISTE CORREO)
+DELETE http://localhost:3000/api/desmarcarcorreo
+Content-Type: application/json
+
+{
+  "direccion_correo": "alan.turing@usm.cl",
+  "clave": "123",
+  "id_correo": 9999
+}
+
+### DESMARCAR CORREO FAVORITO
+DELETE http://localhost:3000/api/desmarcarcorreo
+Content-Type: application/json
+
+{
+  "direccion_correo": "alan.turing@usm.cl",
+  "clave": "123",
+  "id_correo": 22
+}
+
+

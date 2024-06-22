@@ -71,7 +71,7 @@ export async function getInformacion(email: string) {
                     estado: 200,
                     nombre: usuario.nombre,
                     correo: usuario.direccion_correo,
-                    direccion: usuario.descripcion
+                    descripcion: usuario.descripcion
                 };
             });
     } catch (error) {
@@ -211,7 +211,7 @@ export async function bloquear(body: {direccion_correo: string, clave: string, d
     }
 }
 
-export async function desmarcarcorreo(body: { direccion_correo: string, clave: string, correosFavoritos: number }) {
+export async function desmarcarcorreo(body: { direccion_correo: string, clave: string, id_correo: number }) {
     console.log('Proceso de desmarcar correo como favorito');
     try {
         // Asegurarse de que esusuario sea una función asíncrona si se usa una base de datos
@@ -223,27 +223,40 @@ export async function desmarcarcorreo(body: { direccion_correo: string, clave: s
             };
         }
 
+        // Verificar si el correo a desmarcar como favorito existe
+        const verificar_correo = await db.correo.findUnique({
+            where: {
+                correo_id: body.id_correo
+            }
+        });
+        if (!verificar_correo) {
+            return {
+                estado: 400,
+                mensaje: 'Correo no encontrado'
+            };
+        }
+
+
         // Verificar si el correo a desmarcar como favorito esta en la lista de favoritos
-        const verificar_correo = await db.favorito.findUnique({
+        const verificar_correo_fav = await db.favorito.findUnique({
             where: {
                 correo_id_direccion_correo: {
-                    correo_id: body.correosFavoritos,
+                    correo_id: body.id_correo,
                     direccion_correo: body.direccion_correo
                 }
             }
         });
-
-        if (!verificar_correo) {
+        if (!verificar_correo_fav) {
             return {
                 estado: 400,
-                mensaje: 'Correo no encontrado en la lista de favoritos'
+                mensaje: 'El usuario no tiene este correo marcado como favorito'
             };
         }
 
         await db.favorito.delete({
             where: {
                 correo_id_direccion_correo: {
-                    correo_id: body.correosFavoritos,
+                    correo_id: body.id_correo,
                     direccion_correo: body.direccion_correo
                 }
             }
@@ -263,7 +276,6 @@ export async function desmarcarcorreo(body: { direccion_correo: string, clave: s
     }
 }
 
-
 export async function iniciarsesion(email: string) {
     try {
         return db.usuario.findUnique({
@@ -275,10 +287,13 @@ export async function iniciarsesion(email: string) {
                 if (!usuario) {
                     return {
                         estado: 400,
-                        mensaje: 'Usuario no encontrado'
+                        mensaje: 'El correo ingresado no se encuentra registrado'
                     }
                 }
+
                 return {
+                    estado: 200,
+                    nombre: usuario.nombre,
                     correo: usuario.direccion_correo,
                     clave: usuario.clave,
                 };
