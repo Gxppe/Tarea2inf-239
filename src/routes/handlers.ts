@@ -38,16 +38,16 @@ export async function registrar(body: { nombre: string, direccion_correo: string
         })
             .then(() => {
                 return {
-                    estado: 200,
-                    mensaje: 'Usuario registrado'
+                    "estado": 200,
+                    "mensaje": 'Usuario registrado'
                 };
             });
 
     } catch (error) {
         console.error(error);
         return {
-            estado: 500,
-            mensaje: 'Error al registrar usuario'
+            "estado": 500,
+            "mensaje": 'Error al registrar usuario'
         };
     }
 }
