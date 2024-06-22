@@ -306,3 +306,40 @@ export async function iniciarsesion(email: string) {
         };
     }
 }
+
+export async function ver_favoritos(direccion_correo: string, clave: string){
+    try {
+        const verificar = await esusuario(direccion_correo,clave);
+        if (!verificar) {
+            return {
+                estado: 400,
+                mensaje: 'Usuario no encontrado'
+            };
+        }
+
+        return db.favorito.findMany({
+            where: {
+                direccion_correo: direccion_correo
+            }
+        })
+            .then((favoritos) => {
+                if (favoritos.length === 0) {
+                    return {
+                        estado: 400,
+                        mensaje: 'No tienes correos marcados como favoritos'
+                    }
+                }
+
+                return {
+                    estado: 200,
+                    favoritos
+                };
+            });
+    } catch (error) {
+        console.error(error);
+        return {
+            estado: 500,
+            mensaje: 'Error al obtener información de los correos marcados como favoritos'
+        };
+    }
+}

@@ -2,7 +2,8 @@ import requests
 import json
 import time
 import os
-global correo_ingresado, clave_ingresada
+correo_ingresado = None
+clave_ingresada = None
 
 #####################################################################################################################
 # Menús
@@ -66,6 +67,8 @@ def opcion_menu():
 #####################################################################################################################
 # Funciones
 def registro():
+    global correo_ingresado
+    global clave_ingresada
     os.system('clear')
     print("\nRegistro de usuario\n")
     print_warning("* Campos obligatorios")
@@ -90,7 +93,7 @@ def registro():
         "descripcion": descripcion
     }
     response = requests.post(url, json=data).json()
-
+    print(response)
     if response['estado'] == 400:
         os.system('clear')
 
@@ -112,6 +115,8 @@ def registro():
     os.system('clear')
 
 def iniciar_sesion():
+    global correo_ingresado
+    global clave_ingresada
     os.system('clear')
     print("\nInicio de sesión\n")
     correo_ingresado = input("Ingrese su correo electronico: ")
@@ -209,6 +214,17 @@ def desmarcar():
     response = requests.delete(url, params=data)
     print(response.json())
 
+def ver_favoritos():
+    try:
+        url = 'http://localhost:3000/api/ver_favoritos'
+        data = {
+            'correo': correo_ingresado,
+            'clave': clave_ingresada
+        }
+        response = requests.get(url, params=data)
+        print(response.json())
+    except:
+        print("No habían correos marcados como favoritos.")
 
 #####################################################################################################################
 # Main
@@ -227,18 +243,18 @@ def main():
     else:
         print("Opción no válida, intenta de nuevo.")
         main()
-
+    print(correo_ingresado, clave_ingresada)
     while True:
         os.system('clear')
         opcion = opcion_menu()
         if opcion == 1:
             ver_informacion()
         elif opcion == 2:
-            print("Ver correos marcados como favoritos")
+            ver_favoritos()
         elif opcion == 3:
             marcar()
         elif opcion == 4:
-            print("Desmarcar correo como favorito")
+            desmarcar()
         elif opcion == 5:
             bloquear()
         elif opcion == 6:

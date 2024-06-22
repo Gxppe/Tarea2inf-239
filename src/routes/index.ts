@@ -1,5 +1,5 @@
 import { Elysia, t } from "elysia";
-import { getInformacion, registrar, marcarcorreo, bloquear, main_test, iniciarsesion, desmarcarcorreo } from './handlers';
+import { getInformacion, registrar, marcarcorreo, bloquear, main_test, iniciarsesion, desmarcarcorreo, ver_favoritos } from './handlers';
 
 
 const api = new Elysia()
@@ -41,6 +41,12 @@ const api = new Elysia()
             direccion_correo: t.String(),
             clave: t.String(),
             id_correo_fav: t.Number()
+        })
+    })
+    .get('/ver_favoritos', ({params: { body }}) => ver_favoritos(body), {
+        body: t.Object({
+            direccion_correo: t.String(),
+            clave: t.String()
         })
     })
     ;
