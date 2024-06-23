@@ -1,4 +1,4 @@
-El codigo fue ejecutado con la terminal de Ubuntu 22.04 
+El codigo fue ejecutado con la terminal de Ubuntu 22.04 (WSL)
 
 Para inciar a correr la base de datos:
 
