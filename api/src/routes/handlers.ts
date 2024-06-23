@@ -166,7 +166,7 @@ export async function marcarcorreo(body: { direccion_correo: string, clave: stri
 }
 
 export async function bloquear(body: {direccion_correo: string, clave: string, direccion_bloqueada:string}){
-    console.log('Proceso de bloquear direccion de correo');
+    
     try {
         const verificar_usuario = esusuario(body.direccion_correo,body.clave);
         if (!verificar_usuario) {
@@ -196,11 +196,13 @@ export async function bloquear(body: {direccion_correo: string, clave: string, d
             }
         })
             .then(() => {
+                console.log('Proceso de bloquear direccion de correo');
                 return {
                     estado: 200,
                     mensaje: 'Direccion bloqueada con éxito'
                 }
             });
+            
     }
     catch (error) {
         return{
