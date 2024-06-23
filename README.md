@@ -11,9 +11,11 @@ No es importante el nombre de la migracion, elija el que mas le acomode.Para que
 ```
 bun run dev
 ```
-Finalmente dentro de la carpeta "Client" 
+Ahora descargaremos las dependencias del codigo
+```
+pip install -r requirements.txt
+```
+Finalmente para correr
 ```
 python cliente.py
 ```
-
-
