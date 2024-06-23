@@ -1,15 +1,19 @@
-# Elysia with Bun runtime
+El codigo fue ejecutado con la terminal de Ubuntu 22.04 
 
-## Getting Started
-To get started with this template, simply paste this command into your terminal:
-```bash
-bun create elysia ./elysia-example
+Para inciar a correr la base de datos:
+
+Entrar a la carpeta "api" y correr
+Para generar las tablas, recuerde modificar la contraseña en el .env y seguido a eso correr:
 ```
-
-## Development
-To start the development server run:
-```bash
+npx prisma migrate dev
+```
+No es importante el nombre de la migracion, elija el que mas le acomode.Para que funcionen los endpoints:
+```
 bun run dev
 ```
+Finalmente dentro de la carpeta "Client" 
+```
+python cliente.py
+```
 
-Open http://localhost:3000/ with your browser to see the result.
+
