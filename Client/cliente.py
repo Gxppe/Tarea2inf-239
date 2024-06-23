@@ -66,6 +66,10 @@ def opcion_menu():
     return opcion
 #####################################################################################################################
 # Funciones
+
+# Función registro: Esta función recibe los datos del usuario, verifica que los campos obligatorios no estén vacíos y 
+# envía los datos al servidor para registrar al usuario. Luego entrega por consola la respectiva respuesta del servidor.
+
 def registro():
     global correo_ingresado
     global clave_ingresada
@@ -114,6 +118,10 @@ def registro():
 
     os.system('clear')
 
+# Función iniciar_sesion: Esta función recibe los datos del usuario, si los datos están vacíos, el usuario puede volver 
+# a intentar iniciar sesión. Luego envía los datos al servidor para verificar si el usuario existe y si la clave es correcta.
+# Luego entrega por consola la respectiva respuesta del servidor.
+
 def iniciar_sesion():
     global correo_ingresado
     global clave_ingresada
@@ -154,7 +162,9 @@ def iniciar_sesion():
 
         return main()
 
-
+# Función ver_informacion: Esta función recibe un correo electrónico, verifica que no esté vacío y envía el correo al 
+# servidor, si el correo existe, el servidor devuelve la información del correo, de lo contrario, el servidor devuelve
+# un mensaje de error.
 
 def ver_informacion():
     correo = input("Ingrese el correo electronico que desea buscar: ")
@@ -183,6 +193,9 @@ def ver_informacion():
 
 def marcar():
     id_correo = int(input("Ingrese el id del correo que desea marcar como favorito: "))
+    if not id_correo:
+        print("No ingresaste nada, intenta de nuevo.")
+        marcar()
     url = 'http://localhost:3000/api/marcarcorreo'
     data = {
         'correo': correo_ingresado,
