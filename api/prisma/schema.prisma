@@ -13,6 +13,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
+// Tabla usuario, consideramos la direccion de correo electrónicos como clave primaria. Un usuario
+// puede enviar y recibir cero o más correos, por ende establecimos una relación con la tabla Correo
+// Un usuario puede bloquear cero o más usuarios, también establecimos una relación con la tabla Usuario_bloqueado
+// Por último un usuario puede marcar cero o más correos como favoritos, entonces establecimos una relación con 
+// la tabla Favorito.
+
 model Usuario {
   direccion_correo   String              @id
   descripcion        String
@@ -27,6 +34,10 @@ model Usuario {
   correosFavoritos   Favorito[]          @relation("FavoritosRelation")
 }
 
+// Tabla Correo, su clave primaria es un entero que se va incrementando. 
+// Un correo puede ser enviado y entregado a un usuario, por ende establecimos una relación con la tabla Usuario
+// Uno o más correos pueden ser marcados como favoritos, entonces establecimos una relación con la tabla Favorito
+
 model Correo {
   correo_id           Int        @id @default(autoincrement())
   remitente           String
@@ -40,6 +51,9 @@ model Correo {
   favoritos           Favorito[] @relation("FavoritosCorreo")
 }
 
+// Tabla Favorito. Es una tabla con una clave compuesta por el id del correo marcado como favorito y por la direccion 
+// del correo del usuario que marca el correo.
+
 model Favorito {
   correo_id        Int
   direccion_correo String
@@ -48,6 +62,9 @@ model Favorito {
 
   @@id([correo_id, direccion_correo])
 }
+
+// Tabla Usuario_bloqueado. Es una tabla con una clave compuesta por la dirección del correo del usuario bloqueado y 
+// la direccion del correo del usuario que bloquea.
 
 model Usuario_bloqueado {
   bloqueadorCorreo String

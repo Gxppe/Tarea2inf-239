@@ -1,6 +1,7 @@
 import { Elysia, t } from "elysia";
 import { getInformacion, registrar, marcarcorreo, bloquear, main_test, iniciarsesion, desmarcarcorreo, ver_favoritos } from './handlers';
 
+// Definición de la api con sus rutas y validaciones
 
 const api = new Elysia()
     .get('/', () => main_test())

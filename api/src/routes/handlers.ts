@@ -1,5 +1,7 @@
 import db from '../db';
 
+
+// Función esusuario. Recibe la dirección de correo y la clave de un usuario y verifica si existe en la base de datos.
 function esusuario(direccion_correo: string, clave: string){
     return db.usuario.findUnique({
         where: {
@@ -13,6 +15,8 @@ export async function main_test() {
     return db.usuario.findMany();
 }
 
+// Función registrar. Recibe un objeto con los datos de un usuario. Verifica si el correo ya está registrado
+//y si no, lo registra.
 export async function registrar(body: { nombre: string, direccion_correo: string, clave: string, descripcion: string }) {
 
     const {nombre, direccion_correo, clave, descripcion} = body;
@@ -52,6 +56,7 @@ export async function registrar(body: { nombre: string, direccion_correo: string
     }
 }
 
+// Función getInformacion. Recibe la dirección de correo de un usuario y devuelve su información.
 export async function getInformacion(email: string) {
     try {
         return db.usuario.findUnique({
@@ -83,6 +88,9 @@ export async function getInformacion(email: string) {
     }
 }
 
+// Función marcarcorreo. Recibe la dirección de correo y la clave de un usuario, y el id de un correo el cual se quiere
+// marcar como favorito. Verifica si el usuario existe, si el correo existe, si el correo ya está marcado como favorito
+// y si el correo está asociado al usuario. Si todo está correcto, marca el correo como favorito.
 export async function marcarcorreo(body: { direccion_correo: string, clave: string, id_correo_fav: number }) {
     console.log('Proceso de marcar correo como favorito');
     try {
@@ -165,6 +173,9 @@ export async function marcarcorreo(body: { direccion_correo: string, clave: stri
     }
 }
 
+// Función bloquear. Recibe la dirección de correo y la clave de un usuario, y la dirección de correo de otro usuario al
+// cual se quiere bloquear. Verifica si el usuario existe, si el usuario a bloquear existe y si el usuario a bloquear no
+// está ya bloqueado. Si todo está correcto, bloquea al usuario.
 export async function bloquear(body: {direccion_correo: string, clave: string, direccion_bloqueada:string}){
     
     try {
@@ -228,6 +239,10 @@ export async function bloquear(body: {direccion_correo: string, clave: string, d
         }
     }
 }
+
+// Función desmarcarcorreo. Recibe la dirección de correo y la clave de un usuario, y el id de un correo que se quiere
+// desmarcar como favorito. Verifica si el usuario existe, si el correo existe, si el correo está marcado como favorito
+// y si el correo está asociado al usuario. Si todo está correcto, desmarca el correo como favorito.
 
 export async function desmarcarcorreo(body: { direccion_correo: string, clave: string, id_correo_fav: number }) {
     console.log('Proceso de desmarcar correo como favorito');
@@ -293,6 +308,7 @@ export async function desmarcarcorreo(body: { direccion_correo: string, clave: s
     }
 }
 
+// Función iniciarsesion. Recibe la dirección de correo de un usuario y devuelve su información.
 export async function iniciarsesion(email: string) {
     try {
         return db.usuario.findUnique({
@@ -324,10 +340,10 @@ export async function iniciarsesion(email: string) {
     }
 }
 
+// Función ver_favoritos. Recibe la dirección de correo y la clave de un usuario y devuelve los correos
+// marcados como favoritos.
 export async function ver_favoritos(direccion_correo: string){
     try {
-        // Return a list of all the correo objects marked as favorites by the user
-        // You must return the correo objects, not just the correo_id
         return db.favorito.findMany({
             where: {
                 direccion_correo: direccion_correo
@@ -349,7 +365,6 @@ export async function ver_favoritos(direccion_correo: string){
                     correos: correos
                 };
             });
-
     } catch (error) {
         console.error(error);
         return {

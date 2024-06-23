@@ -10,9 +10,9 @@ clave_ingresada = None
 # Menús
 
 menu_inicial = """
-------------------------------------
-|₊˚⊹☆¡Bienvenid@ a CommuniKen!☆⊹˚₊|
-------------------------------------
+-----------------------------------------
+| ₊˚⊹☆ ¡Bienvenid@ a CommuniKen! ☆⊹˚₊ |
+-----------------------------------------
 Elige una de las siguientes opciones:
 1. Registrarse
 2. Iniciar sesión
@@ -20,9 +20,9 @@ Elige una de las siguientes opciones:
 
 """
 menu_opciones = """
-------------------------------------------------
-    |⋆˚☆˖°¡Hola! ¿Qué deseas hacer? °˖☆˚⋆|
-------------------------------------------------
+--------------------------------------------
+|  ⋆˚☆˖° ¡Hola! ¿Qué deseas hacer? °˖☆˚⋆  |
+--------------------------------------------
 Elige una de las siguientes opciones:
 1. Ver informacion sobre un correo electronico
 2. Ver correos marcados como favoritos
@@ -34,7 +34,7 @@ Elige una de las siguientes opciones:
 """
 menu_salida = """
 --------------------------------------------
-| ๋࣭ ⭑⚝¡Gracias por usar CommuniKen!⚝⭑ ࣭ ๋|
+|  ๋࣭ ⭑⚝ ¡Gracias por usar CommuniKen! ⚝⭑ ࣭ ๋ |
 --------------------------------------------
 """
 
@@ -250,6 +250,9 @@ def bloquear():
 
 def desmarcar():
     id_correo = int(input("Ingrese el id del correo que desea desmarcar como favorito: "))
+    if not id_correo:
+        print("No ingresaste nada, intenta de nuevo.")
+        desmarcar()
     url = 'http://localhost:3000/api/desmarcarcorreo'
     data = {
         'direccion_correo': correo_ingresado,
@@ -305,7 +308,8 @@ def ver_favoritos():
         print_error(e)
 
 #####################################################################################################################
-# Main
+# Función principal del programa. esta función muestra el menú principal y las opciones que el usuario puede elegir.
+# Luego, según la opción elegida, se ejecuta la función correspondiente.
 def main():
     os.system('clear')
     opcioni = opcion_inicial()
