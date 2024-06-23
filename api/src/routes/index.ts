@@ -36,17 +36,16 @@ const api = new Elysia()
             correo: t.String()
         })
     })
-    .delete('/desmarcarcorreo', ({params: {body} } ) => desmarcarcorreo(body), {
+    .delete('/desmarcarcorreo', ({body} ) => desmarcarcorreo(body), {
         body: t.Object({
             direccion_correo: t.String(),
             clave: t.String(),
             id_correo_fav: t.Number()
         })
     })
-    .get('/ver_favoritos', ({params: { correo,clave }}) => ver_favoritos(correo,clave), {
-        body: t.Object({
-            direccion_correo: t.String(),
-            clave: t.String()
+    .get('/ver_favoritos/:correo', ({params: { correo }}) => ver_favoritos(correo), {
+        params: t.Object({
+            correo: t.String()
         })
     })
     ;

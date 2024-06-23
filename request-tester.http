@@ -78,7 +78,7 @@ Content-Type: application/json
 {
   "direccion_correo": "alan.turing@usm.cl",
   "clave": "123",
-  "id_correo": 9999
+  "id_correo_fav": 9999
 }
 
 ### DESMARCAR CORREO FAVORITO
@@ -88,7 +88,21 @@ Content-Type: application/json
 {
   "direccion_correo": "alan.turing@usm.cl",
   "clave": "123",
-  "id_correo": 22
+  "id_correo_fav": 22
+}
+
+### VER FAVORITOS
+GET http://localhost:3000/api/ver_favoritos/alan.turing@usm.cl
+Accept: application/json}
+
+### BLOQUEAR USUARIO
+POST http://localhost:3000/api/bloquear
+Content-Type: application/json
+
+{
+  "direccion_correo": "alan.turing@usm.cl",
+     "clave": "123",
+"direccion_bloqueada": "cocos@mail.com"
 }
 
 

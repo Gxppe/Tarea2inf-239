@@ -86,7 +86,7 @@ export async function getInformacion(email: string) {
 export async function marcarcorreo(body: { direccion_correo: string, clave: string, id_correo_fav: number }) {
     console.log('Proceso de marcar correo como favorito');
     try {
-        const verificar = await esusuario(body.direccion_correo,body.clave);
+        const verificar = await esusuario(body.direccion_correo, body.clave);
         if (!verificar) {
             return {
                 estado: 400,
@@ -189,6 +189,22 @@ export async function bloquear(body: {direccion_correo: string, clave: string, d
             };
         }
 
+        const verificar_bloqueo_existente = await db.usuario_bloqueado.findUnique({
+            where: {
+                bloqueadorCorreo_bloqueadoCorreo: {
+                    bloqueadorCorreo: body.direccion_correo,
+                    bloqueadoCorreo: body.direccion_bloqueada
+                }
+            }
+        });
+
+        if (verificar_bloqueo_existente) {
+            return {
+                estado: 400,
+                mensaje: 'Usuario ya bloqueado'
+            };
+        }
+
         return db.usuario_bloqueado.create({
             data: {
                 bloqueadorCorreo: body.direccion_correo,
@@ -213,7 +229,7 @@ export async function bloquear(body: {direccion_correo: string, clave: string, d
     }
 }
 
-export async function desmarcarcorreo(body: { direccion_correo: string, clave: string, id_correo: number }) {
+export async function desmarcarcorreo(body: { direccion_correo: string, clave: string, id_correo_fav: number }) {
     console.log('Proceso de desmarcar correo como favorito');
     try {
         // Asegurarse de que esusuario sea una función asíncrona si se usa una base de datos
@@ -228,7 +244,7 @@ export async function desmarcarcorreo(body: { direccion_correo: string, clave: s
         // Verificar si el correo a desmarcar como favorito existe
         const verificar_correo = await db.correo.findUnique({
             where: {
-                correo_id: body.id_correo
+                correo_id: body.id_correo_fav
             }
         });
         if (!verificar_correo) {
@@ -238,12 +254,11 @@ export async function desmarcarcorreo(body: { direccion_correo: string, clave: s
             };
         }
 
-
         // Verificar si el correo a desmarcar como favorito esta en la lista de favoritos
         const verificar_correo_fav = await db.favorito.findUnique({
             where: {
                 correo_id_direccion_correo: {
-                    correo_id: body.id_correo,
+                    correo_id: body.id_correo_fav,
                     direccion_correo: body.direccion_correo
                 }
             }
@@ -255,23 +270,22 @@ export async function desmarcarcorreo(body: { direccion_correo: string, clave: s
             };
         }
 
+        // Eliminar el correo de la lista de favoritos
         await db.favorito.delete({
             where: {
                 correo_id_direccion_correo: {
-                    correo_id: body.id_correo,
+                    correo_id: body.id_correo_fav,
                     direccion_correo: body.direccion_correo
                 }
             }
-            
         });
 
         return {
             estado: 200,
             mensaje: 'Correo desmarcado como favorito'
         };
-
     } catch (error) {
-        console.error('Error al desmarcar correo como favorito', error);
+        console.error('Error:', error);
         return {
             estado: 500,
             mensaje: 'Ha ocurrido un error al desmarcar el correo como favorito'
@@ -310,34 +324,32 @@ export async function iniciarsesion(email: string) {
     }
 }
 
-export async function ver_favoritos(direccion_correo: string, clave: string){
+export async function ver_favoritos(direccion_correo: string){
     try {
-        const verificar = await esusuario(direccion_correo,clave);
-        if (!verificar) {
-            return {
-                estado: 400,
-                mensaje: 'Usuario no encontrado'
-            };
-        }
-
+        // Return a list of all the correo objects marked as favorites by the user
+        // You must return the correo objects, not just the correo_id
         return db.favorito.findMany({
             where: {
                 direccion_correo: direccion_correo
+            },
+            select: {
+                correo: true
             }
         })
-            .then((favoritos) => {
-                if (favoritos.length === 0) {
+            .then((correos) => {
+                if (!correos) {
                     return {
                         estado: 400,
-                        mensaje: 'No tienes correos marcados como favoritos'
+                        mensaje: 'No se encontraron correos marcados como favoritos'
                     }
                 }
 
                 return {
                     estado: 200,
-                    favoritos
+                    correos: correos
                 };
             });
+
     } catch (error) {
         console.error(error);
         return {

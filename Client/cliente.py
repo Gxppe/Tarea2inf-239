@@ -1,7 +1,8 @@
 import requests
-import json
 import time
 import os
+from datetime import datetime
+
 correo_ingresado = None
 clave_ingresada = None
 
@@ -46,7 +47,7 @@ def print_error(mensaje, end="\n", press_enter=True):
 
 def print_success(mensaje, end="\n"):
     print(f"\033[38;5;2m{mensaje}\033[0m")
-    time.sleep(2)
+    time.sleep(1)
 
 def print_warning(mensaje, end="\n"):
     text = f"\033[38;5;3m{mensaje}\033[0m"
@@ -56,14 +57,23 @@ def print_warning(mensaje, end="\n"):
 #####################################################################################################################
 # Funciones de opciones
 def opcion_inicial():
+    os.system('clear')
     print(menu_inicial, end="")
-    opcion = int(input("Ingrese el número de la opción que desea: "))
-    return opcion
+    opcion = input("Ingrese el número de la opción que desea: ")
+
+    try:
+        return int(opcion)
+    except:
+        return opcion_inicial()
 
 def opcion_menu():
+    os.system('clear')
     print(menu_opciones)
-    opcion = int(input("Ingrese el número de la opción que desea: "))
-    return opcion
+    opcion = input("Ingrese el número de la opción que desea: ")
+    try:
+        return int(opcion)
+    except:
+        return opcion_menu()
 #####################################################################################################################
 # Funciones
 
@@ -198,46 +208,101 @@ def marcar():
         marcar()
     url = 'http://localhost:3000/api/marcarcorreo'
     data = {
-        'correo': correo_ingresado,
+        'direccion_correo': correo_ingresado,
         'clave': clave_ingresada,
-        'id_correo': id_correo
+        'id_correo_fav': id_correo
     }
-    response = requests.post(url, params=data)
-    print(response.json())
+    response = requests.post(url, json=data).json()
+
+    os.system('clear')
+    print()
+
+    if response['estado'] == 400:
+	    print_error(response['mensaje'])
+	    return
+    elif response['estado'] == 500:
+        print_error(response['mensaje'])
+        return
+
+    print_success(response['mensaje'])
 
 def bloquear():
     correo_bloqueado = input("Ingrese el correo que desea bloquear: ")
     url = 'http://localhost:3000/api/bloquear'
     data = {
-        'correo': correo_ingresado,
+        'direccion_correo': correo_ingresado,
         'clave': clave_ingresada,
-        'correo_bloqueado': correo_bloqueado
+        'direccion_bloqueada': correo_bloqueado
     }
-    response = requests.post(url, params=data)
-    print(response.json())
+    response = requests.post(url, json=data).json()
+
+    os.system('clear')
+    print()
+
+    if response['estado'] == 400:
+        print_error(response['mensaje'])
+        return
+    elif response['estado'] == 500:
+        print_error(response['mensaje'])
+        return
+
+    print_success(response['mensaje'])
 
 def desmarcar():
     id_correo = int(input("Ingrese el id del correo que desea desmarcar como favorito: "))
     url = 'http://localhost:3000/api/desmarcarcorreo'
     data = {
-        'correo': correo_ingresado,
+        'direccion_correo': correo_ingresado,
         'clave': clave_ingresada,
-        'id_correo': id_correo
+        'id_correo_fav': id_correo
     }
-    response = requests.delete(url, params=data)
-    print(response.json())
+    response = requests.delete(url, json=data).json()
+
+    os.system('clear')
+    print()
+
+    if response['estado'] == 400:
+        print_error(response['mensaje'])
+        return
+    elif response['estado'] == 500:
+        print_error(response['mensaje'])
+        return
+
+    print_success(response['mensaje'])
 
 def ver_favoritos():
     try:
-        url = 'http://localhost:3000/api/ver_favoritos'
-        data = {
-            'correo': correo_ingresado,
-            'clave': clave_ingresada
-        }
-        response = requests.get(url, params=data)
-        print(response.json())
-    except:
-        print("No habían correos marcados como favoritos.")
+        url = 'http://localhost:3000/api/ver_favoritos/'+correo_ingresado
+        response = requests.get(url).json()
+        print(response)
+
+        if response['estado'] == 500:
+            os.system('clear')
+            print_error(response['mensaje'])
+            return
+        if response['estado'] == 400:
+            print_warning("\n"+response['mensaje'])
+            input("\nPresiona enter para continuar...")
+            return
+
+        os.system('clear')
+
+        correos = response['correos']
+        text_correos = [correo['correo'] for correo in correos]
+        print("CORREOS MARCADOS COMO FAVORITOS\n")
+
+        if len(text_correos) == 0:
+            print_warning("\nNo tienes correos marcados como favoritos.")
+            input("Presiona enter para continuar...")
+            return
+
+        print(f"|{'ID':^5}|{'Asunto':^16}|{'Fecha':^20}|")
+        for correo in text_correos:
+            print(f"|{correo['correo_id']:^5}|{correo['asunto']:^16}|{datetime.strptime(correo['fecha_envio'], '%Y-%m-%dT%H:%M:%S.%fZ').strftime('%d/%m/%Y'):^20}|")
+
+        input("\nPresiona enter para continuar...")
+    except Exception as e:
+        print_error(e)
 
 #####################################################################################################################
 # Main
