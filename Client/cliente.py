@@ -1,5 +1,4 @@
 import requests
-import json
 import time
 import os
 correo_ingresado = None
@@ -9,9 +8,9 @@ clave_ingresada = None
 # Menús
 
 menu_inicial = """
-------------------------------------
-|₊˚⊹☆¡Bienvenid@ a CommuniKen!☆⊹˚₊|
-------------------------------------
+-----------------------------------------
+| ₊˚⊹☆ ¡Bienvenid@ a CommuniKen! ☆⊹˚₊ |
+-----------------------------------------
 Elige una de las siguientes opciones:
 1. Registrarse
 2. Iniciar sesión
@@ -19,9 +18,9 @@ Elige una de las siguientes opciones:
 
 """
 menu_opciones = """
-------------------------------------------------
-    |⋆˚☆˖°¡Hola! ¿Qué deseas hacer? °˖☆˚⋆|
-------------------------------------------------
+--------------------------------------------
+|  ⋆˚☆˖° ¡Hola! ¿Qué deseas hacer? °˖☆˚⋆  |
+--------------------------------------------
 Elige una de las siguientes opciones:
 1. Ver informacion sobre un correo electronico
 2. Ver correos marcados como favoritos
@@ -33,7 +32,7 @@ Elige una de las siguientes opciones:
 """
 menu_salida = """
 --------------------------------------------
-| ๋࣭ ⭑⚝¡Gracias por usar CommuniKen!⚝⭑ ࣭ ๋|
+|  ๋࣭ ⭑⚝ ¡Gracias por usar CommuniKen! ⚝⭑ ࣭ ๋ |
 --------------------------------------------
 """
 
@@ -190,6 +189,9 @@ def ver_informacion():
     print(informacion)
     input("\nPresiona enter para continuar...")
 
+# Funcion marcar: Esta función recibe el id del correo que se desea marcar como favorito, verifica que no esté vacío y
+# envía el id del correo al servidor, si el correo existe, el servidor lo marca como favorito, de lo contrario, el servidor
+# devuelve un mensaje de error.
 
 def marcar():
     id_correo = int(input("Ingrese el id del correo que desea marcar como favorito: "))
@@ -203,7 +205,17 @@ def marcar():
         'id_correo': id_correo
     }
     response = requests.post(url, params=data)
+    if response.status_code == 400:
+        os.system('clear')
+        print("No se pudo marcar el correo como favorito.")
+    else:
+        os.system('clear')
+        print("Correo marcado como favorito.")
     print(response.json())
+    return
+
+# Funcion bloquear: Esta función recibe el correo que se desea bloquear, verifica que no esté vacío y envía el correo al
+# servidor, si el correo existe, el servidor lo bloquea, de lo contrario, el servidor devuelve un mensaje de error.
 
 def bloquear():
     correo_bloqueado = input("Ingrese el correo que desea bloquear: ")
@@ -214,10 +226,25 @@ def bloquear():
         'correo_bloqueado': correo_bloqueado
     }
     response = requests.post(url, params=data)
+
+    if response.status_code == 400:
+        os.system('clear')
+        print("No se pudo bloquear el correo.")
+    else:
+        os.system('clear')
+        print("Correo bloqueado.")
     print(response.json())
+    return
+
+# Funcion desmarcar: Esta función recibe el id del correo que se desea desmarcar como favorito, verifica que no esté vacío y
+# envía el id del correo al servidor, si el correo está marcado, el servidor lo desmarca como favorito, de lo contrario, 
+# el servidor devuelve un mensaje de error.
 
 def desmarcar():
     id_correo = int(input("Ingrese el id del correo que desea desmarcar como favorito: "))
+    if not id_correo:
+        print("No ingresaste nada, intenta de nuevo.")
+        desmarcar()
     url = 'http://localhost:3000/api/desmarcarcorreo'
     data = {
         'correo': correo_ingresado,
@@ -225,7 +252,14 @@ def desmarcar():
         'id_correo': id_correo
     }
     response = requests.delete(url, params=data)
+    if response.status_code == 400:
+        os.system('clear')
+        print("No se pudo desmarcar el correo como favorito.")
+    else:
+        os.system('clear')
+        print("Correo desmarcado como favorito.")
     print(response.json())
+    return
 
 def ver_favoritos():
     try:
@@ -240,7 +274,8 @@ def ver_favoritos():
         print("No habían correos marcados como favoritos.")
 
 #####################################################################################################################
-# Main
+# Función principal del programa. esta función muestra el menú principal y las opciones que el usuario puede elegir.
+# Luego, según la opción elegida, se ejecuta la función correspondiente.
 def main():
     os.system('clear')
     opcioni = opcion_inicial()
@@ -278,7 +313,4 @@ def main():
             continue
     return
 
-
-response = requests.get('https://api.github.com')
-print(response.status_code)
 main()
